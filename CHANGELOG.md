@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-06-03
+
 ### Changed
 
 - Release Assets workflow runs when a `v*` tag is pushed (creates or updates the GitHub release with `claude-mod.zip` and `module.json`); manual **Run workflow** still available
+
+### Fixed
+
+- **Configure Journal Sources** dialog: journal list shows a permanent vertical scrollbar (flex-constrained scroll region, classic WebKit scrollbar styling, and scroll position preserved on re-render)
 
 ## [0.3.3] - 2026-06-02
 
