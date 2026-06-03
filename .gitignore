@@ -1,4 +1,25 @@
+# Cursor / IDE
+.cursor/
+.vscode/
+.idea/
+*.code-workspace
+
+# Agent / local dev notes (not needed in the published module)
+AGENTS.md
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Logs and temp
 *.log
+*.tmp
+*.temp
+
+# Release artifacts (built locally; uploaded via GitHub Releases)
 *.zip
+
+# Secrets
+.env
+.env.*
