@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Release Assets workflow runs when a `v*` tag is pushed (creates or updates the GitHub release with `claude-mod.zip` and `module.json`); manual **Run workflow** still available
 
+## [0.3.3] - 2026-06-02
+
+### Fixed
+
+- **Configure Journal Sources** dialog: journal/folder checklist scrolls inside the selection frame when there are many entries
+
+## [0.3.2] - 2026-06-02
+
+### Fixed
+
+- Journal context extraction no longer calls removed `foundry.utils.stripTags` (not available in Foundry v14); uses `DOMParser` instead
+
 ## [0.3.1] - 2026-06-02
 
 ### Changed

@@ -13,6 +13,7 @@
     <legend>{{localize "CLAUDE-MOD.Settings.JournalContextCustomLegend"}}</legend>
     <p class="hint">{{localize "CLAUDE-MOD.Settings.JournalContextCustomHint"}}</p>
 
+    <div class="claude-mod-journal-context-scroll">
     {{#if folders.length}}
     <div class="form-group">
       <label>{{localize "CLAUDE-MOD.Settings.JournalContextFolders"}}</label>
@@ -60,6 +61,7 @@
       </ul>
     </div>
     {{/if}}
+    </div>
   </fieldset>
 
   <footer class="claude-mod-form-footer">

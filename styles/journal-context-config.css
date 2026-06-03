@@ -1,13 +1,18 @@
-.claude-mod.journal-context-config .window-app,
-.claude-mod.journal-context-config .window-content {
-  overflow: hidden;
-}
-
-.claude-mod.journal-context-config .window-content {
+/* ApplicationV2: fixed-height window; scroll the journal list region */
+.claude-mod.journal-context-config.application .window-content {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   padding: 0.75rem;
   min-height: 0;
+}
+
+.claude-mod.journal-context-config.application form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .claude-mod-journal-context-form {
@@ -16,6 +21,7 @@
   flex: 1;
   min-height: 0;
   gap: 0.5rem;
+  overflow: hidden;
 }
 
 .claude-mod-journal-context-form > .form-group {
@@ -45,9 +51,19 @@
   pointer-events: none;
 }
 
-.claude-mod-journal-context-custom {
-  overflow-y: auto;
+.claude-mod-journal-context-form fieldset > legend,
+.claude-mod-journal-context-form fieldset > .hint {
+  flex-shrink: 0;
+}
+
+.claude-mod-journal-context-scroll {
+  flex: 1;
   min-height: 0;
+  max-height: min(52vh, 520px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-top: 0.35rem;
+  padding-right: 0.35rem;
 }
 
 .claude-mod-checklist {

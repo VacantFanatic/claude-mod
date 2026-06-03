@@ -195,12 +195,22 @@ export function getPagesForContext(journal, modeSet) {
 }
 
 /**
+ * @param {string} html
+ * @returns {string}
+ */
+function htmlToPlainText(html) {
+  if (!html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
+}
+
+/**
  * @param {JournalEntryPage} page
  * @returns {string}
  */
 function extractPagePlainText(page) {
   if (page.type === "text" && page.text?.content) {
-    const plain = foundry.utils.stripTags(page.text.content).replace(/\s+/g, " ").trim();
+    const plain = htmlToPlainText(page.text.content);
     return plain ? `### ${page.name}\n${plain}` : "";
   }
 
