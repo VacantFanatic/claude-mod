@@ -1,0 +1,54 @@
+name: Release Assets
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set version from release tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$TAG" ]; then
+            echo "::error::Release tag must use a v-prefix (e.g. v0.1.10). Got: $TAG"
+            exit 1
+          fi
+          jq --arg v "$VERSION" '.version = $v' module.json > module.json.tmp
+          mv module.json.tmp module.json
+          echo "Packaging claude-mod v${VERSION}"
+
+      - name: Build module zip
+        run: |
+          mkdir -p dist/claude-mod
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='dist' \
+            --exclude='.cursor' \
+            --exclude='.vscode' \
+            --exclude='.idea' \
+            --exclude='AGENTS.md' \
+            --exclude='.gitignore' \
+            --exclude='*.zip' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            ./ dist/claude-mod/
+          (cd dist && zip -rq ../claude-mod.zip claude-mod)
+
+      - name: Upload assets to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            claude-mod.zip \
+            module.json \
+            --clobber

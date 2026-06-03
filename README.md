@@ -22,12 +22,19 @@ Query Claude from a dedicated ApplicationV2 window or via chat commands. Your AP
 
 ### Install from manifest URL
 
-After publishing to GitHub Releases:
+In Foundry Setup, use **Install Module** with:
 
-1. Create a release tagged with the version (e.g. `v0.1.9`).
-2. Attach **`module.json`** and **`claude-mod.zip`** (zip root folder must be `claude-mod/`).
-3. In Foundry Setup, use **Install Module** with:
-   `https://github.com/VacantFanatic/claude-mod/releases/latest/download/module.json`
+`https://github.com/VacantFanatic/claude-mod/releases/latest/download/module.json`
+
+## Releasing
+
+1. Update [CHANGELOG.md](CHANGELOG.md) on `main`.
+2. On GitHub, open **Releases → Draft a new release**.
+3. Create a tag in `v0.0.0` format (e.g. `v0.1.10`) — the workflow sets `module.json` `version` from this tag.
+4. Save as **draft** (or publish when ready). Creating the release triggers the [Release Assets](.github/workflows/release.yml) workflow, which uploads `module.json` and `claude-mod.zip`.
+5. When the workflow finishes, publish the release if it is still a draft.
+
+Re-run the workflow from the **Actions** tab if you need to rebuild assets for the same tag.
 
 ## Configuration
 
