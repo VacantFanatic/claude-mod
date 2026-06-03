@@ -1,0 +1,39 @@
+{
+  "id": "claude-mod",
+  "title": "Claude Query",
+  "description": "<p>GM-only Claude API assistant for Foundry VTT.</p><ul><li>Dedicated query window with conversation memory</li><li>Chat commands: <code>/claude</code>, <code>/w claude</code>, <code>/w gm-claude</code></li><li>Scene control button and <code>Ctrl+Shift+C</code> keybinding</li></ul><p><strong>Security:</strong> Your API key is stored locally in this browser (not in the world database) and is sent directly to Anthropic. Use a dedicated key with usage limits.</p>",
+  "version": "0.1.9",
+  "authors": [
+    {
+      "name": "VacantFanatic",
+      "url": "https://github.com/VacantFanatic"
+    }
+  ],
+  "url": "https://github.com/VacantFanatic/claude-mod",
+  "license": "LICENSE",
+  "readme": "README.md",
+  "changelog": "CHANGELOG.md",
+  "bugs": "https://github.com/VacantFanatic/claude-mod/issues",
+  "manifest": "https://github.com/VacantFanatic/claude-mod/releases/latest/download/module.json",
+  "download": "https://github.com/VacantFanatic/claude-mod/releases/latest/download/claude-mod.zip",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14.360"
+  },
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "styles": [
+    "styles/claude-query.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "flags": {
+    "allowBugReporter": false
+  }
+}

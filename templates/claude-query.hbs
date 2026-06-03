@@ -1,0 +1,40 @@
+<section class="claude-mod-query">
+  <div class="form-group claude-mod-prompt-panel">
+    <label for="claude-prompt">{{localize "CLAUDE-MOD.PromptLabel"}}</label>
+    <textarea
+      id="claude-prompt"
+      name="prompt"
+      rows="5"
+      placeholder='{{localize "CLAUDE-MOD.PromptPlaceholder"}}'
+      {{#if loading}}disabled{{/if}}
+    >{{prompt}}</textarea>
+  </div>
+
+  <div class="claude-mod-actions">
+    <button type="button" data-action="sendQuery" {{#unless hasApiKey}}disabled{{/unless}} {{#if loading}}disabled{{/if}}>
+      <i class="fa-solid fa-paper-plane"></i> {{localize "CLAUDE-MOD.Send"}}
+    </button>
+    <button type="button" data-action="clearPrompt" {{#if loading}}disabled{{/if}}>
+      <i class="fa-solid fa-eraser"></i> {{localize "CLAUDE-MOD.Clear"}}
+    </button>
+    <button type="button" data-action="newConversation" {{#if loading}}disabled{{/if}}>
+      <i class="fa-solid fa-rotate-left"></i> {{localize "CLAUDE-MOD.NewConversation"}}
+    </button>
+  </div>
+
+  {{#unless hasApiKey}}
+  <p class="claude-mod-warning">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    {{localize "CLAUDE-MOD.NoApiKeyWarning"}}
+  </p>
+  {{/unless}}
+
+  <p class="claude-mod-status {{#if loading}}loading{{/if}}">{{status}}</p>
+
+  <div class="form-group claude-mod-response-group">
+    <label class="claude-mod-panel-label">{{localize "CLAUDE-MOD.ResponseLabel"}}</label>
+    <div class="claude-mod-response-panel">
+      <div class="claude-mod-response">{{response}}</div>
+    </div>
+  </div>
+</section>

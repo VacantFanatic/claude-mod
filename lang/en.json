@@ -1,0 +1,72 @@
+{
+  "CLAUDE-MOD": {
+    "QueryWindowTitle": "Claude Query",
+    "Settings": {
+      "ApiKey": "Anthropic API Key",
+      "ApiKeyHint": "Stored locally in this browser only (not in the world database).",
+      "ApiKeySecureHint": "Your API key is stored in this browser's local storage and is never written to the world database. It is still visible in browser devtools while a request is in flight, so use a dedicated key with usage limits.",
+      "ApiKeyMenuName": "Anthropic API Key",
+      "ApiKeyMenuLabel": "Configure API Key",
+      "ApiKeyMenuHint": "Set or remove your Anthropic API key (stored locally in this browser).",
+      "ApiKeyPlaceholder": "sk-ant-…",
+      "ApiKeyConfigured": "An API key is configured on this browser.",
+      "ApiKeyRequired": "Enter an API key to save.",
+      "ApiKeyUnchanged": "Existing API key kept (leave the field blank to keep the current key).",
+      "ApiKeySaved": "Anthropic API key saved locally.",
+      "ApiKeyCleared": "Anthropic API key removed from this browser.",
+      "ApiKeyMigrated": "Your API key was moved from world settings to secure local storage on this browser.",
+      "SaveApiKey": "Save API Key",
+      "ClearApiKey": "Remove API Key",
+      "ClearApiKeyConfirm": "Remove the stored API key from this browser?",
+      "Model": "Claude Model",
+      "MaxTokens": "Max Response Tokens",
+      "SystemPrompt": "System Prompt",
+      "SystemPromptHint": "Instructions sent with every request to shape Claude's behavior.",
+      "Temperature": "Temperature",
+      "TemperatureHint": "Response randomness from 0 (focused) to 1 (creative).",
+      "ContextLength": "Conversation Memory (turns)",
+      "ContextLengthHint": "Number of recent user/assistant turns to remember per session.",
+      "ChatEnabled": "Enable Chat Commands",
+      "ChatEnabledHint": "Allow /claude, /w claude, and /w gm-claude chat commands.",
+      "EchoToChat": "Echo Window Replies to Chat",
+      "EchoToChatHint": "Post query window responses as GM-only chat whispers.",
+      "ModelMigrated": "Claude model updated from {from} to {to} (previous model is no longer available)."
+    },
+    "KeybindingOpenQuery": "Open Claude Query Window",
+    "SceneControlTitle": "Claude Query",
+    "PromptLabel": "Your Question",
+    "PromptPlaceholder": "Ask Claude anything…",
+    "ResponseLabel": "Response",
+    "Send": "Send",
+    "Clear": "Clear Prompt",
+    "NewConversation": "New Conversation",
+    "NoApiKeyWarning": "Configure your Anthropic API key via Configure API Key in Module Settings.",
+    "OpenSettings": "Open Module Settings",
+    "Status": {
+      "Ready": "Ready",
+      "Loading": "Waiting for Claude…",
+      "Success": "Response received ({model})",
+      "ConversationReset": "Conversation history cleared."
+    },
+    "Chat": {
+      "ToClaude": "To Claude:",
+      "FromClaude": "Claude"
+    },
+    "Errors": {
+      "GmOnly": "Only the GM can use Claude Query.",
+      "NoApiKey": "Anthropic API key is not configured in module settings.",
+      "EmptyPrompt": "Enter a question before sending.",
+      "InvalidApiKey": "Authentication failed. Check your Anthropic API key.",
+      "CorsBlocked": "Browser access to the Anthropic API is blocked for this organization. Contact Anthropic support or use an API key from an org with browser access enabled.",
+      "ApiFailure": "The Anthropic API request failed.",
+      "NoResponse": "Claude returned an empty response.",
+      "InvalidModel": "Invalid or retired Claude model ({detail}). Open Configure Settings → Claude Query and choose a current model.",
+      "InvalidModelGeneric": "The configured Claude model was not found. Open Configure Settings → Claude Query and choose a current model."
+    },
+    "Models": {
+      "claude-sonnet-4-6": "Claude Sonnet 4.6",
+      "claude-haiku-4-5": "Claude Haiku 4.5",
+      "claude-opus-4-6": "Claude Opus 4.6"
+    }
+  }
+}

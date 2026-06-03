@@ -1,0 +1,47 @@
+---
+description: Foundry VTT module development conventions for this project
+alwaysApply: true
+---
+
+# Foundry Module Development
+
+Canonical references:
+
+- [Introduction to Module Development](https://foundryvtt.com/article/module-development/) — official manifest, structure, and loading
+- [Modules (Community Wiki)](https://foundryvtt.wiki/en/basics/Modules) — module basics, installation, and development overview
+
+## Module Layout
+
+- `module.json` at the module root (required)
+- Recommended folders: `scripts/`, `styles/`, `templates/`, `packs/`, `lang/`
+- Module `id` must match the folder name (lowercase, hyphens only)
+
+## Manifest Essentials
+
+Required fields: `id`, `title`, `description`, `version`
+
+- Prefer `esmodules` over legacy `scripts`
+- Target Foundry **14.360** in `compatibility`
+- Common optional fields: `languages`, `styles`, `packs`, `packFolders`, `relationships`, `socket`, `library`, `manifest`, `download`
+
+## Entry Pattern
+
+```javascript
+Hooks.on("init", () => {
+  // Register settings, libWrapper, CONFIG extensions
+});
+
+Hooks.on("ready", () => {
+  // Game data is available
+});
+```
+
+Modules only affect the game view — not Setup or Join screens.
+
+## Related References
+
+- Modules wiki: https://foundryvtt.wiki/en/basics/Modules
+- API docs: https://foundryvtt.wiki/en/development
+- Foundry articles: https://github.com/foundryvtt/foundryvtt/tree/master/articles
+- dnd5e reference (API patterns only — do not infer game rules): https://github.com/foundryvtt/dnd5e
+- Changelog format: https://keepachangelog.com/en/

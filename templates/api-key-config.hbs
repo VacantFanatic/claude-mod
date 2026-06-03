@@ -1,0 +1,33 @@
+<section class="claude-mod-api-key-config">
+  <p class="notes">{{localize "CLAUDE-MOD.Settings.ApiKeySecureHint"}}</p>
+
+  <div class="form-group">
+    <label for="claude-api-key">{{localize "CLAUDE-MOD.Settings.ApiKey"}}</label>
+    <input
+      id="claude-api-key"
+      name="apiKey"
+      type="password"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder='{{localize "CLAUDE-MOD.Settings.ApiKeyPlaceholder"}}'
+    />
+  </div>
+
+  {{#if hasExistingKey}}
+  <p class="claude-mod-key-status">
+    <i class="fa-solid fa-circle-check"></i>
+    {{localize "CLAUDE-MOD.Settings.ApiKeyConfigured"}}
+  </p>
+  {{/if}}
+
+  <footer class="claude-mod-api-key-footer">
+    <button type="submit">
+      <i class="fa-solid fa-floppy-disk"></i> {{localize "CLAUDE-MOD.Settings.SaveApiKey"}}
+    </button>
+    {{#if hasExistingKey}}
+    <button type="button" data-action="clearApiKey">
+      <i class="fa-solid fa-trash"></i> {{localize "CLAUDE-MOD.Settings.ClearApiKey"}}
+    </button>
+    {{/if}}
+  </footer>
+</section>
