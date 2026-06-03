@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Release Assets workflow runs when a `v*` tag is pushed (creates or updates the GitHub release with `claude-mod.zip` and `module.json`); manual **Run workflow** still available
 
+## [0.3.1] - 2026-06-02
+
+### Changed
+
+- Journal context is merged into the API **system** prompt instead of prepended to each user message; loaded once per conversation and cached until **New Conversation**
+- Conversation history stores only the GM's questions (no repeated journal text in prior turns), reducing token use on multi-turn chats
+
 ## [0.3.0] - 2026-06-02
 
 ### Added

@@ -1,6 +1,6 @@
 import { ANTHROPIC_API_URL, ANTHROPIC_VERSION, MODULE_ID } from "../constants.js";
 import { getApiKey } from "../settings/api-key.js";
-import { buildContext } from "./context-builder.js";
+import { buildJournalSystemSection } from "./context-builder.js";
 import { appendConversationLog } from "../journal/journal-service.js";
 
 export class ClaudeService {
@@ -9,6 +9,9 @@ export class ClaudeService {
   /** @type {Array<{ role: string, content: string }>} */
   #history = [];
 
+  /** Cached journal block for the current conversation (cleared on reset). */
+  #sessionJournalSystem = "";
+
   static getInstance() {
     if (!this.#instance) this.#instance = new ClaudeService();
     return this.#instance;
@@ -16,6 +19,7 @@ export class ClaudeService {
 
   resetHistory() {
     this.#history = [];
+    this.#sessionJournalSystem = "";
   }
 
   /**
@@ -36,13 +40,15 @@ export class ClaudeService {
       throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
     }
 
-    const context = await buildContext();
-    const userContent = context.prefix ? `${context.prefix}\n\n${trimmed}` : trimmed;
+    if (this.#history.length === 0) {
+      const { systemSection } = await buildJournalSystemSection();
+      this.#sessionJournalSystem = systemSection;
+    }
 
-    this.#history.push({ role: "user", content: userContent });
+    this.#history.push({ role: "user", content: trimmed });
     this.#trimHistory();
 
-    const systemPrompt = game.settings.get(MODULE_ID, "systemPrompt")?.trim();
+    const system = this.#composeSystem();
     /** @type {Record<string, unknown>} */
     const body = {
       model: game.settings.get(MODULE_ID, "model"),
@@ -50,7 +56,7 @@ export class ClaudeService {
       messages: this.#history,
     };
 
-    if (systemPrompt) body.system = systemPrompt;
+    if (system) body.system = system;
 
     const temperature = game.settings.get(MODULE_ID, "temperature");
     if (Number.isFinite(temperature)) body.temperature = temperature;
@@ -106,6 +112,18 @@ export class ClaudeService {
       model: data.model ?? String(body.model),
       usage: data.usage,
     };
+  }
+
+  /**
+   * Merges the configured system prompt with cached journal context for this conversation.
+   * @returns {string|undefined}
+   */
+  #composeSystem() {
+    const parts = [];
+    const userPrompt = game.settings.get(MODULE_ID, "systemPrompt")?.trim();
+    if (userPrompt) parts.push(userPrompt);
+    if (this.#sessionJournalSystem) parts.push(this.#sessionJournalSystem);
+    return parts.length ? parts.join("\n\n") : undefined;
   }
 
   #trimHistory() {

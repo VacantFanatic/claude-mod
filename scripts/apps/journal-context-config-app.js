@@ -25,6 +25,7 @@ export class JournalContextConfigApplication extends HandlebarsApplicationMixin(
   static PARTS = {
     content: {
       template: "modules/claude-mod/templates/journal-context-config.hbs",
+      scrollable: [""],
     },
   };
 

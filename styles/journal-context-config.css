@@ -1,5 +1,25 @@
+.claude-mod.journal-context-config .window-app,
 .claude-mod.journal-context-config .window-content {
+  overflow: hidden;
+}
+
+.claude-mod.journal-context-config .window-content {
+  display: flex;
+  flex-direction: column;
   padding: 0.75rem;
+  min-height: 0;
+}
+
+.claude-mod-journal-context-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0.5rem;
+}
+
+.claude-mod-journal-context-form > .form-group {
+  flex-shrink: 0;
 }
 
 .claude-mod-journal-context-form .hint {
@@ -9,10 +29,15 @@
 }
 
 .claude-mod-journal-context-form fieldset {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   border: 1px solid var(--color-border-light-2);
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
-  margin: 0.5rem 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .claude-mod-journal-context-form fieldset:disabled {
@@ -20,12 +45,15 @@
   pointer-events: none;
 }
 
+.claude-mod-journal-context-custom {
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .claude-mod-checklist {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 10rem;
-  overflow-y: auto;
 }
 
 .claude-mod-checklist li {
@@ -41,8 +69,9 @@
 
 .claude-mod-form-footer {
   display: flex;
+  flex-shrink: 0;
   justify-content: flex-end;
-  margin-top: 0.75rem;
+  margin-top: 0.25rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--color-border-light-2);
 }

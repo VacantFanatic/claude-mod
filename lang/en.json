@@ -31,7 +31,7 @@
       "EchoToChat": "Echo Window Replies to Chat",
       "EchoToChatHint": "Post query window responses as GM-only chat whispers.",
       "JournalContextEnabled": "Include Journal Context",
-      "JournalContextEnabledHint": "Prepend journal text to each Claude request so answers can reference your notes.",
+      "JournalContextEnabledHint": "Adds journal text to the system prompt once per conversation (use New Conversation to refresh). Follow-up messages do not duplicate journal text in chat history.",
       "JournalContextMode": "Journal Context Sources",
       "JournalContextModeHint": "Which journals to include. Use Custom Selection for folder and journal checklists. Pinned pages always override and are included regardless of mode.",
       "JournalContextModeClaudeOnly": "Claude Notes only",

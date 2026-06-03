@@ -2,7 +2,7 @@
   "id": "claude-mod",
   "title": "Claude Query",
   "description": "<p>GM-only Claude API assistant for Foundry VTT.</p><ul><li>Dedicated query window with conversation memory</li><li>Journal context and a Claude Notes log journal</li><li>Chat commands: <code>/claude</code>, <code>/w claude</code>, <code>/w gm-claude</code></li><li>Scene control button and <code>Ctrl+Shift+C</code> keybinding</li></ul><p><strong>Security:</strong> Your API key is stored locally in this browser (not in the world database) and is sent directly to Anthropic. Use a dedicated key with usage limits.</p>",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "authors": [
     {
       "name": "VacantFanatic",
