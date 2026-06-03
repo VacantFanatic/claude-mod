@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-02
+
+### Added
+
+- **Journal context sources** — mode setting (`Claude Notes only`, `All journals`, `Custom selection`) with **Configure Journal Sources** menu for folder and journal checklists
+- **Exclude Conversation Log from Context** setting (default on) to avoid sending the full Q&A log on every request while still logging exchanges
+- **Pin for Claude Context** header controls on journal entry and page sheets (GM only); pinned pages override mode and limit context to selected pages only
+- Module API: `togglePageContextPin()`, `toggleJournalContextPin()`, `isPageContextPinned()`
+
+### Changed
+
+- Replaced **Include All Other Journals** boolean with journal context mode (worlds with that setting enabled migrate to **All journals** on load)
+
+## [0.2.0] - 2026-06-02
+
+### Added
+
+- Journal integration: optional context from the Claude Notes journal (and optionally all other journals) is prepended to each Claude request
+- Automatic conversation log on a dedicated **Claude Notes** journal entry (configurable in module settings)
+- **Open Claude Journal** button in the query window
+- Module API: `openClaudeJournal()`, `getClaudeJournal()`, `ensureClaudeJournal()`
+- Settings: include journal context, read other journals, context character limit, and log exchanges to journal
+
 ## [0.1.9] - 2026-06-02
 
 ### Added

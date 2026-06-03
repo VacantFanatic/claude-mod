@@ -1,0 +1,48 @@
+.claude-mod.journal-context-config .window-content {
+  padding: 0.75rem;
+}
+
+.claude-mod-journal-context-form .hint {
+  font-size: var(--font-size-12);
+  color: var(--color-text-light-emphasis);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.claude-mod-journal-context-form fieldset {
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.claude-mod-journal-context-form fieldset:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.claude-mod-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.claude-mod-checklist li {
+  margin: 0.15rem 0;
+}
+
+.claude-mod-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.claude-mod-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border-light-2);
+}

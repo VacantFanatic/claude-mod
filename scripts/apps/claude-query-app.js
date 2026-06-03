@@ -1,6 +1,7 @@
 import { ClaudeService } from "../api/claude-service.js";
 import { hasApiKey } from "../settings/api-key.js";
 import { MODULE_ID } from "../constants.js";
+import { openClaudeJournal } from "../journal/journal-service.js";
 import { formatPromptChatContent, formatResponseChatContent } from "../chat/chat-format.js";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -23,6 +24,7 @@ export class ClaudeQueryApplication extends HandlebarsApplicationMixin(Applicati
       sendQuery: ClaudeQueryApplication.#onSendQuery,
       clearPrompt: ClaudeQueryApplication.#onClearPrompt,
       newConversation: ClaudeQueryApplication.#onNewConversation,
+      openJournal: ClaudeQueryApplication.#onOpenJournal,
     },
   };
 
@@ -115,6 +117,12 @@ export class ClaudeQueryApplication extends HandlebarsApplicationMixin(Applicati
     this.response = "";
     this.status = game.i18n.localize("CLAUDE-MOD.Status.ConversationReset");
     await this.render({ force: true });
+  }
+
+  /** @this {ClaudeQueryApplication} */
+  static async #onOpenJournal(event) {
+    event.preventDefault();
+    await openClaudeJournal();
   }
 }
 

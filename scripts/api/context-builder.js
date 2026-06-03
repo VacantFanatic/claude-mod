@@ -1,11 +1,29 @@
+import { collectJournalContext } from "../journal/journal-service.js";
+
 /**
  * Builds optional game context to prepend to Claude prompts.
- * Stub implementation — extend later with selected tokens, journals, etc.
- * @returns {{ prefix: string, metadata: Record<string, unknown> }}
+ * @returns {Promise<{ prefix: string, metadata: Record<string, unknown> }>}
  */
-export function buildContext() {
+export async function buildContext() {
+  const { entries, truncated } = await collectJournalContext();
+
+  if (!entries.length) {
+    return { prefix: "", metadata: { journals: [] } };
+  }
+
+  const header = game.i18n.localize("CLAUDE-MOD.Journal.ContextHeader");
+  const sections = entries.map((entry) => `## ${entry.name}\n${entry.text}`);
+  let prefix = `${header}\n\n${sections.join("\n\n")}`;
+
+  if (truncated) {
+    prefix += `\n\n${game.i18n.localize("CLAUDE-MOD.Journal.ContextTruncated")}`;
+  }
+
   return {
-    prefix: "",
-    metadata: {},
+    prefix,
+    metadata: {
+      journals: entries.map((e) => ({ id: e.id, name: e.name, length: e.text.length })),
+      truncated,
+    },
   };
 }

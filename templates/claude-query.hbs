@@ -20,6 +20,9 @@
     <button type="button" data-action="newConversation" {{#if loading}}disabled{{/if}}>
       <i class="fa-solid fa-rotate-left"></i> {{localize "CLAUDE-MOD.NewConversation"}}
     </button>
+    <button type="button" data-action="openJournal" {{#if loading}}disabled{{/if}}>
+      <i class="fa-solid fa-book"></i> {{localize "CLAUDE-MOD.OpenClaudeJournal"}}
+    </button>
   </div>
 
   {{#unless hasApiKey}}

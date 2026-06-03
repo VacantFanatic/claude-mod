@@ -17,3 +17,13 @@ export const DEPRECATED_MODELS = {
   "claude-sonnet-4-20250514": "claude-sonnet-4-6",
   "claude-3-5-haiku-20241022": "claude-haiku-4-5",
 };
+
+/** @type {Record<string, string>} */
+export const JOURNAL_CONTEXT_MODE_CHOICES = {
+  claudeOnly: "CLAUDE-MOD.Settings.JournalContextModeClaudeOnly",
+  all: "CLAUDE-MOD.Settings.JournalContextModeAll",
+  custom: "CLAUDE-MOD.Settings.JournalContextModeCustom",
+};
+
+export const JOURNAL_CONTEXT_MODE_DEFAULT = "claudeOnly";
+export const CONTEXT_PINNED_FLAG = "contextPinned";

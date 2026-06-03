@@ -7,10 +7,11 @@ Query Claude from a dedicated ApplicationV2 window or via chat commands. Your AP
 ## Features
 
 - **Query window** — prompt, response panel, conversation memory, and styled UI
+- **Journal integration** — configurable journal context (Claude Notes only, all journals, or custom folders/journals); pin pages from journal sheets; exchanges logged to **Claude Notes**
 - **Chat commands** — `/claude …`, `/w claude …`, `/w gm-claude …`
 - **Scene control** — message icon under Journal Notes
 - **Keybinding** — `Ctrl+Shift+C` (GM only)
-- **Module API** — `game.modules.get("claude-mod").api.openQueryWindow()`
+- **Module API** — `openQueryWindow()`, `openClaudeJournal()`, `getClaudeJournal()`, `ensureClaudeJournal()`, `togglePageContextPin()`, `toggleJournalContextPin()`, `isPageContextPinned()`
 
 ## Installation
 
@@ -51,6 +52,10 @@ Re-run the workflow from the **Actions** tab if you need to rebuild assets for t
 | Open query window | Journal Notes toolbar → message icon, or `Ctrl+Shift+C` |
 | Chat query | `/claude Your question` or `/w claude Your question` |
 | New conversation | **New Conversation** in the query window |
+| Open Claude journal | **Open Claude Journal** in the query window |
+| Journal context sources | **Configure Settings → Claude Query** → **Configure Journal Sources** (mode, folders, journals) |
+| Pin journal for Claude | Thumbtack control on an open journal entry or page sheet (GM only) |
+| Journal context / logging | Module settings: include context, exclude conversation log, character limit, log exchanges |
 
 ## Compatibility
 

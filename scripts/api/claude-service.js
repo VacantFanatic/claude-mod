@@ -1,6 +1,7 @@
 import { ANTHROPIC_API_URL, ANTHROPIC_VERSION, MODULE_ID } from "../constants.js";
 import { getApiKey } from "../settings/api-key.js";
 import { buildContext } from "./context-builder.js";
+import { appendConversationLog } from "../journal/journal-service.js";
 
 export class ClaudeService {
   static #instance = null;
@@ -35,7 +36,7 @@ export class ClaudeService {
       throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
     }
 
-    const context = buildContext();
+    const context = await buildContext();
     const userContent = context.prefix ? `${context.prefix}\n\n${trimmed}` : trimmed;
 
     this.#history.push({ role: "user", content: userContent });
@@ -93,6 +94,12 @@ export class ClaudeService {
 
     this.#history.push({ role: "assistant", content: text });
     this.#trimHistory();
+
+    try {
+      await appendConversationLog(trimmed, text);
+    } catch (error) {
+      console.warn(`${MODULE_ID} | Failed to write Claude journal`, error);
+    }
 
     return {
       text,

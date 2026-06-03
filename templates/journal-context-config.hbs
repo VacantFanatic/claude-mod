@@ -1,0 +1,70 @@
+<section class="claude-mod-journal-context-form">
+  <div class="form-group">
+    <label for="journal-context-mode">{{localize "CLAUDE-MOD.Settings.JournalContextMode"}}</label>
+    <select id="journal-context-mode" name="journalContextMode">
+      {{#each modes}}
+      <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+      {{/each}}
+    </select>
+    <p class="hint">{{localize "CLAUDE-MOD.Settings.JournalContextModeHint"}}</p>
+  </div>
+
+  <fieldset class="claude-mod-journal-context-custom" {{#unless isCustomMode}}disabled{{/unless}}>
+    <legend>{{localize "CLAUDE-MOD.Settings.JournalContextCustomLegend"}}</legend>
+    <p class="hint">{{localize "CLAUDE-MOD.Settings.JournalContextCustomHint"}}</p>
+
+    {{#if folders.length}}
+    <div class="form-group">
+      <label>{{localize "CLAUDE-MOD.Settings.JournalContextFolders"}}</label>
+      <ul class="claude-mod-checklist">
+        {{#each folders}}
+        <li>
+          <label>
+            <input type="checkbox" name="folderIds" value="{{id}}" {{#if checked}}checked{{/if}} />
+            {{name}}
+          </label>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    {{#each journalGroups}}
+    <div class="form-group">
+      <label>{{folderName}}</label>
+      <ul class="claude-mod-checklist">
+        {{#each journals}}
+        <li>
+          <label>
+            <input type="checkbox" name="journalIds" value="{{id}}" {{#if checked}}checked{{/if}} />
+            {{name}}
+          </label>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/each}}
+
+    {{#if unsortedJournals.length}}
+    <div class="form-group">
+      <label>{{localize "CLAUDE-MOD.Settings.JournalContextUnsorted"}}</label>
+      <ul class="claude-mod-checklist">
+        {{#each unsortedJournals}}
+        <li>
+          <label>
+            <input type="checkbox" name="journalIds" value="{{id}}" {{#if checked}}checked{{/if}} />
+            {{name}}
+          </label>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+  </fieldset>
+
+  <footer class="claude-mod-form-footer">
+    <button type="submit">
+      <i class="fa-solid fa-save"></i> {{localize "CLAUDE-MOD.Settings.JournalContextSave"}}
+    </button>
+  </footer>
+</section>

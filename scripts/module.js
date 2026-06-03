@@ -1,7 +1,17 @@
 import { ClaudeQueryApplication } from "./apps/claude-query-app.js";
 import { registerApiKeySetting } from "./apps/api-key-config-app.js";
+import { registerJournalContextSettings } from "./apps/journal-context-config-app.js";
 import { registerChatCommands } from "./chat/chat-commands.js";
-import { DEFAULT_MODEL, DEPRECATED_MODELS, MODEL_CHOICES, MODULE_ID } from "./constants.js";
+import { DEFAULT_MODEL, DEPRECATED_MODELS, JOURNAL_CONTEXT_MODE_DEFAULT, MODEL_CHOICES, MODULE_ID } from "./constants.js";
+import {
+  ensureClaudeJournal,
+  getClaudeJournal,
+  isPageContextPinned,
+  openClaudeJournal,
+  toggleJournalContextPin,
+  togglePageContextPin,
+} from "./journal/journal-service.js";
+import { registerJournalSheetHooks } from "./journal/journal-sheet-hooks.js";
 import { migrateWorldApiKey } from "./settings/api-key.js";
 
 const openQueryWindow = () => ClaudeQueryApplication.open();
@@ -12,11 +22,20 @@ Hooks.once("init", () => {
   registerSettings();
   registerKeybindings();
   registerChatCommands();
+  registerJournalSheetHooks();
   Hooks.on("getSceneControlButtons", onGetSceneControlButtons);
 });
 
 Hooks.once("ready", async () => {
-  game.modules.get(MODULE_ID).api = { openQueryWindow };
+  game.modules.get(MODULE_ID).api = {
+    openQueryWindow,
+    openClaudeJournal,
+    getClaudeJournal,
+    ensureClaudeJournal,
+    togglePageContextPin,
+    toggleJournalContextPin,
+    isPageContextPinned,
+  };
 
   try {
     await migrateWorldApiKey();
@@ -25,6 +44,7 @@ Hooks.once("ready", async () => {
   }
 
   await migrateModelSetting();
+  await migrateJournalContextSettings();
 });
 
 async function migrateModelSetting() {
@@ -44,8 +64,23 @@ async function migrateModelSetting() {
   }
 }
 
+async function migrateJournalContextSettings() {
+  const settingKey = `${MODULE_ID}.journalReadOthers`;
+  if (!game.settings.settings.has(settingKey)) return;
+
+  const readOthers = game.settings.get(MODULE_ID, "journalReadOthers");
+  const mode = game.settings.get(MODULE_ID, "journalContextMode");
+
+  if (readOthers && mode === JOURNAL_CONTEXT_MODE_DEFAULT) {
+    await game.settings.set(MODULE_ID, "journalContextMode", "all");
+    console.log(`${MODULE_ID} | Migrated journalReadOthers → journalContextMode "all"`);
+  }
+}
+
 function registerSettings() {
   registerApiKeySetting();
+  registerJournalContextSettings();
+
   game.settings.register(MODULE_ID, "model", {
     name: "CLAUDE-MOD.Settings.Model",
     scope: "world",
@@ -115,6 +150,45 @@ function registerSettings() {
     restricted: true,
     type: Boolean,
     default: false,
+  });
+
+  game.settings.register(MODULE_ID, "claudeJournalId", {
+    scope: "world",
+    config: false,
+    restricted: true,
+    type: String,
+    default: "",
+  });
+
+  game.settings.register(MODULE_ID, "journalContextEnabled", {
+    name: "CLAUDE-MOD.Settings.JournalContextEnabled",
+    hint: "CLAUDE-MOD.Settings.JournalContextEnabledHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register(MODULE_ID, "journalContextMaxChars", {
+    name: "CLAUDE-MOD.Settings.JournalContextMaxChars",
+    hint: "CLAUDE-MOD.Settings.JournalContextMaxCharsHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Number,
+    range: { min: 1000, max: 100_000, step: 500 },
+    default: 12_000,
+  });
+
+  game.settings.register(MODULE_ID, "journalWriteEnabled", {
+    name: "CLAUDE-MOD.Settings.JournalWriteEnabled",
+    hint: "CLAUDE-MOD.Settings.JournalWriteEnabledHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
   });
 }
 
