@@ -29,13 +29,21 @@ In Foundry Setup, use **Install Module** with:
 
 ## Releasing
 
-1. Update [CHANGELOG.md](CHANGELOG.md) on `main`.
-2. On GitHub, open **Releases → Draft a new release**.
-3. Create a tag in `v0.0.0` format (e.g. `v0.1.10`) — the workflow sets `module.json` `version` from this tag.
-4. Save as **draft** (or publish when ready). Creating the release triggers the [Release Assets](.github/workflows/release.yml) workflow, which uploads `module.json` and `claude-mod.zip`.
-5. When the workflow finishes, publish the release if it is still a draft.
+1. Update [CHANGELOG.md](CHANGELOG.md) on `main`, bump `module.json` `version` if needed, commit, and push to `main`.
+2. Create and push an annotated tag (must start with `v`; the workflow sets `module.json` `version` from the tag):
 
-Re-run the workflow from the **Actions** tab if you need to rebuild assets for the same tag.
+   ```bash
+   git tag -a v0.3.0 -m "v0.3.0"
+   git push origin v0.3.0
+   ```
+
+3. Pushing the tag runs [Release Assets](.github/workflows/release.yml): it builds `claude-mod.zip`, patches `module.json`, and creates or updates the GitHub release with those assets.
+4. Confirm **Actions** is enabled (**Settings → Actions → General**). Open the **Actions** tab once if GitHub asks to approve workflows.
+5. When the workflow finishes, verify `claude-mod.zip` and `module.json` on the release page.
+
+**Manual re-run:** **Actions → Release Assets → Run workflow**, enter the tag (e.g. `v0.3.0`).
+
+You can still draft release notes on GitHub after the tag push; the workflow creates the release if it does not exist yet.
 
 ## Configuration
 

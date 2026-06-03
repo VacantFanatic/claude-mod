@@ -1,11 +1,21 @@
 name: Release Assets
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (e.g. v0.3.0)
+        required: true
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-${{ github.ref_name || inputs.tag }}
+  cancel-in-progress: true
 
 jobs:
   package:
@@ -14,12 +24,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="${{ inputs.tag }}"
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::No release tag found. Push a v* tag or use workflow_dispatch with a tag input."
+            exit 1
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Using tag: ${TAG}"
+
       - name: Set version from release tag
         run: |
-          TAG="${{ github.event.release.tag_name }}"
+          TAG="${{ steps.tag.outputs.tag }}"
           VERSION="${TAG#v}"
           if [ -z "$VERSION" ] || [ "$VERSION" = "$TAG" ]; then
-            echo "::error::Release tag must use a v-prefix (e.g. v0.1.10). Got: $TAG"
+            echo "::error::Release tag must use a v-prefix (e.g. v0.3.0). Got: $TAG"
             exit 1
           fi
           jq --arg v "$VERSION" '.version = $v' module.json > module.json.tmp
@@ -44,11 +69,13 @@ jobs:
             ./ dist/claude-mod/
           (cd dist && zip -rq ../claude-mod.zip claude-mod)
 
-      - name: Upload assets to release
+      - name: Publish GitHub release assets
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
-            claude-mod.zip \
-            module.json \
-            --clobber
+          TAG="${{ steps.tag.outputs.tag }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" claude-mod.zip module.json --clobber
+          else
+            gh release create "$TAG" claude-mod.zip module.json --title "$TAG" --generate-notes
+          fi

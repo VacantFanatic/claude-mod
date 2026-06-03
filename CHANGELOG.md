@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Release Assets workflow runs when a `v*` tag is pushed (creates or updates the GitHub release with `claude-mod.zip` and `module.json`); manual **Run workflow** still available
+
 ## [0.3.0] - 2026-06-02
 
 ### Added
