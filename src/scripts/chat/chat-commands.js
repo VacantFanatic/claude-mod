@@ -1,77 +1,26 @@
 import { ClaudeService } from "../api/claude-service.js";
 import { CHAT_ALIASES, MODULE_ID } from "../constants.js";
 import { formatPromptChatContent, formatResponseChatContent } from "./chat-format.js";
+
 const WHISPER_PATTERN = /^\/w(?:hisper)?\s+(\[(?:[^\]]+)\]|[^\s]+)(?:\s+([\s\S]*))?$/i;
-const CLAUDE_COMMAND_PATTERN = /^\/claude\s+([\s\S]+)/i;
+export const CLAUDE_COMMAND_PATTERN = /^\/claude(?:\s+([\s\S]*))?$/i;
 
-/** @type {boolean} */
-let processMessagePatched = false;
-
-export function registerChatCommands() {
-  Hooks.once("ready", () => {
-    patchProcessMessage();
-    registerClaudeSlashCommand();
-  });
-}
-
-function registerClaudeSlashCommand() {
-  const { ChatLog } = foundry.applications.sidebar.tabs;
-
-  ChatLog.CHAT_COMMANDS[`${MODULE_ID}-command`] = {
-    rgx: CLAUDE_COMMAND_PATTERN,
-    fn: handleClaudeCommand,
-  };
-}
-
-function patchProcessMessage() {
-  if (processMessagePatched) return;
-
-  const { ChatLog } = foundry.applications.sidebar.tabs;
-  const originalProcessMessage = ChatLog.prototype.processMessage;
-
-  ChatLog.prototype.processMessage = async function processMessageWithClaude(message, options = {}) {
-    const whisperQuestion = parseClaudeWhisper(message);
-    if (whisperQuestion !== false) {
-      if (!game.user.isGM) {
-        ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.GmOnly"));
-        return;
-      }
-      if (!game.settings.get(MODULE_ID, "chatEnabled")) {
-        ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Settings.ChatEnabledHint"));
-        return;
-      }
-      if (!whisperQuestion) {
-        ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
-        return;
-      }
-      await handleClaudeQuery(whisperQuestion, options);
-      return;
-    }
-
-    if (game.user.isGM && game.settings.get(MODULE_ID, "chatEnabled")) {
-      const commandMatch = message.match(CLAUDE_COMMAND_PATTERN);
-      if (commandMatch) {
-        const question = commandMatch[1]?.trim();
-        if (!question) {
-          ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
-          return;
-        }
-        await handleClaudeQuery(question, options);
-        return;
-      }
-    }
-
-    return originalProcessMessage.call(this, message, options);
-  };
-
-  processMessagePatched = true;
+/**
+ * @param {string} message
+ * @returns {string|false|null} Question text, null if /claude matched without text, or false if not matched
+ */
+export function parseClaudeSlashMessage(message) {
+  const match = message.match(CLAUDE_COMMAND_PATTERN);
+  if (!match) return false;
+  const question = match[1]?.trim() ?? "";
+  return question || null;
 }
 
 /**
  * @param {string} message
  * @returns {string|false} Question text, empty string if alias matched with no question, or false if not a Claude whisper
  */
-function parseClaudeWhisper(message) {
+export function parseClaudeWhisper(message) {
   const match = message.match(WHISPER_PATTERN);
   if (!match) return false;
 
@@ -83,6 +32,57 @@ function parseClaudeWhisper(message) {
   if (!aliases.some((alias) => CHAT_ALIASES.includes(alias))) return false;
 
   return match[2]?.trim() ?? "";
+}
+
+export function registerChatCommands() {
+  Hooks.once("init", registerClaudeSlashCommand);
+  Hooks.on("chatMessage", onChatMessage);
+}
+
+function getChatLogClass() {
+  return foundry.applications?.sidebar?.tabs?.ChatLog ?? ChatLog;
+}
+
+function registerClaudeSlashCommand() {
+  const ChatLogClass = getChatLogClass();
+  if (!ChatLogClass?.CHAT_COMMANDS) {
+    console.error(`${MODULE_ID} | Unable to register /claude — ChatLog.CHAT_COMMANDS is unavailable`);
+    return;
+  }
+
+  ChatLogClass.CHAT_COMMANDS[`${MODULE_ID}.claude`] = {
+    rgx: CLAUDE_COMMAND_PATTERN,
+    fn: handleClaudeCommand,
+  };
+}
+
+/**
+ * @param {ChatLog} _chatLog
+ * @param {string} message
+ * @param {object} chatData
+ */
+function onChatMessage(_chatLog, message, chatData) {
+  if (!game.user.isGM || !game.settings.get(MODULE_ID, "chatEnabled")) return;
+
+  const whisperQuestion = parseClaudeWhisper(message);
+  if (whisperQuestion !== false) {
+    if (!whisperQuestion) {
+      ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
+      return false;
+    }
+    void handleClaudeQuery(whisperQuestion, { speaker: chatData.speaker });
+    return false;
+  }
+
+  const slashQuestion = parseClaudeSlashMessage(message);
+  if (slashQuestion !== false) {
+    if (slashQuestion === null) {
+      ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
+      return false;
+    }
+    void handleClaudeQuery(slashQuestion, { speaker: chatData.speaker });
+    return false;
+  }
 }
 
 /**
@@ -111,8 +111,16 @@ async function handleClaudeCommand(_command, match, chatData, createOptions) {
     return false;
   }
 
-  const question = match[1]?.trim();
-  if (!question) return false;
+  if (!game.settings.get(MODULE_ID, "chatEnabled")) {
+    ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Settings.ChatEnabledHint"));
+    return false;
+  }
+
+  const question = match[1]?.trim() ?? "";
+  if (!question) {
+    ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
+    return false;
+  }
 
   chatData.whisper = [game.user.id];
   chatData.content = formatPromptChatContent(question);

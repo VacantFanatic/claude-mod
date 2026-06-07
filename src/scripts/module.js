@@ -1,13 +1,7 @@
-import { CampaignAssistantApplication } from "./apps/campaign-assistant-app.js";
-import { ClaudeQueryApplication } from "./apps/claude-query-app.js";
 import { registerApiKeySetting } from "./apps/api-key-config-app.js";
 import { registerJournalContextSettings } from "./apps/journal-context-config-app.js";
 import { registerChatCommands } from "./chat/chat-commands.js";
 import { DEFAULT_MODEL, DEPRECATED_MODELS, JOURNAL_CONTEXT_MODE_DEFAULT, MODEL_CHOICES, MODULE_ID } from "./constants.js";
-import {
-  createAssistantJournal,
-  getRecentlyCreated,
-} from "./journal/assistant-content-service.js";
 import {
   ensureClaudeJournal,
   getClaudeJournal,
@@ -19,8 +13,15 @@ import {
 import { registerJournalSheetHooks } from "./journal/journal-sheet-hooks.js";
 import { migrateWorldApiKey } from "./settings/api-key.js";
 
-const openQueryWindow = () => ClaudeQueryApplication.open();
-const openCampaignAssistant = () => CampaignAssistantApplication.open();
+async function openQueryWindow() {
+  const { ClaudeQueryApplication } = await import("./apps/claude-query-app.js");
+  return ClaudeQueryApplication.open();
+}
+
+async function openCampaignAssistant() {
+  const { CampaignAssistantApplication } = await import("./apps/campaign-assistant-app.js");
+  return CampaignAssistantApplication.open();
+}
 
 function openPrimaryAssistantWindow() {
   if (game.settings.get(MODULE_ID, "useCampaignAssistant")) {
@@ -50,8 +51,14 @@ Hooks.once("ready", async () => {
     togglePageContextPin,
     toggleJournalContextPin,
     isPageContextPinned,
-    createAssistantJournal,
-    getRecentlyCreated,
+    createAssistantJournal: async (...args) => {
+      const { createAssistantJournal } = await import("./journal/assistant-content-service.js");
+      return createAssistantJournal(...args);
+    },
+    getRecentlyCreated: async (...args) => {
+      const { getRecentlyCreated } = await import("./journal/assistant-content-service.js");
+      return getRecentlyCreated(...args);
+    },
   };
 
   try {
@@ -62,6 +69,7 @@ Hooks.once("ready", async () => {
 
   await migrateModelSetting();
   await migrateJournalContextSettings();
+  console.log(`${MODULE_ID} | Ready`);
 });
 
 async function migrateModelSetting() {
@@ -225,7 +233,7 @@ function registerKeybindings() {
     editable: [{ key: "KeyC", modifiers: ["CONTROL", "SHIFT"] }],
     restricted: true,
     onDown: () => {
-      openPrimaryAssistantWindow();
+      void openPrimaryAssistantWindow();
       return true;
     },
   });
@@ -237,10 +245,7 @@ function registerKeybindings() {
 function onGetSceneControlButtons(controls) {
   if (!game.user.isGM) return;
 
-  const notes = controls.notes;
-  if (!notes?.tools) return;
-
-  notes.tools["claude-query"] = {
+  const tool = {
     name: "claude-query",
     title: "CLAUDE-MOD.SceneControlTitle",
     icon: "fa-solid fa-wand-magic-sparkles",
@@ -251,4 +256,15 @@ function onGetSceneControlButtons(controls) {
       void openPrimaryAssistantWindow();
     },
   };
+
+  const notes = controls.notes;
+  if (notes?.tools) {
+    notes.tools["claude-query"] = tool;
+    return;
+  }
+
+  const tokens = controls.tokens;
+  if (tokens?.tools) {
+    tokens.tools["claude-query"] = { ...tool, order: Object.keys(tokens.tools).length };
+  }
 }
