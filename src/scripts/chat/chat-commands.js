@@ -35,7 +35,9 @@ export function parseClaudeWhisper(message) {
 }
 
 export function registerChatCommands() {
-  Hooks.once("init", registerClaudeSlashCommand);
+  // Register immediately — this runs from module init. A nested Hooks.once("init")
+  // would never fire because Foundry snapshots init listeners before calling them.
+  registerClaudeSlashCommand();
   Hooks.on("chatMessage", onChatMessage);
 }
 

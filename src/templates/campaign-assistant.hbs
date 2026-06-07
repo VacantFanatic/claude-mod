@@ -70,13 +70,9 @@
         <div class="claude-mod-panel-header-title">
           <i class="fa-solid fa-globe"></i>
           <span>{{localize "CLAUDE-MOD.CampaignAssistant.WorldTitle"}}</span>
-          {{#if worldSummary.source}}
+          {{#if worldSummarySourceLabel}}
           <span class="claude-mod-world-summary-source claude-mod-world-summary-source--{{worldSummary.source}}">
-            {{#if (eq worldSummary.source "ai")}}
-              {{localize "CLAUDE-MOD.CampaignAssistant.WorldSourceAi"}}
-            {{else}}
-              {{localize "CLAUDE-MOD.CampaignAssistant.WorldSourceExcerpt"}}
-            {{/if}}
+            {{worldSummarySourceLabel}}
           </span>
           {{/if}}
         </div>

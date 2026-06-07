@@ -89,7 +89,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    if (!this.worldSummaryLoaded) {
+    if (!this.worldSummaryLoaded && !this.worldSummaryLoading) {
       await this.loadWorldSummary();
     }
 
@@ -110,6 +110,10 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     context.suggestionCount = this.suggestions.length;
     context.worldSummary = this.worldSummary;
     context.worldSummaryLoading = this.worldSummaryLoading;
+    context.worldSummarySourceLabel =
+      this.worldSummary.source === "ai"
+        ? game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldSourceAi")
+        : game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldSourceExcerpt");
     context.recentlyCreated = getRecentlyCreated(5);
     context.quickCreateTypes = getQuickCreateTypes().map((type) => ({
       ...type,
@@ -142,9 +146,6 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   }
 
   async loadWorldSummary({ forceRefresh = false } = {}) {
-    this.worldSummaryLoading = true;
-    await this.render({ force: true });
-
     try {
       this.worldSummary = await getWorldSummary({ forceRefresh });
       this.worldSummaryLoaded = true;
@@ -157,8 +158,6 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
         source: "excerpt",
         followUp: "",
       };
-    } finally {
-      this.worldSummaryLoading = false;
     }
   }
 
@@ -259,8 +258,15 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   /** @this {CampaignAssistantApplication} */
   static async #onRefreshWorldSummary(event) {
     event.preventDefault();
-    await this.loadWorldSummary({ forceRefresh: true });
+    this.worldSummaryLoading = true;
     await this.render({ force: true });
+
+    try {
+      await this.loadWorldSummary({ forceRefresh: true });
+    } finally {
+      this.worldSummaryLoading = false;
+      await this.render({ force: true });
+    }
 
     const messageKey =
       this.worldSummary.source === "ai"
