@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-07
+
+### Fixed
+
+- `/claude` chat command registers on `init` and is also intercepted via the `chatMessage` hook, preventing Foundry's "not a valid chat message command" error when the command was not yet registered
+- `/claude` without a question now shows a helpful prompt instead of falling through to core chat validation
+- Campaign Assistant and query apps are lazy-loaded so a failure in optional UI code cannot block module startup, chat commands, or the scene control button
+- Scene control button falls back to the token tools layer if the notes layer is unavailable
+
 ## [0.5.0] - 2026-06-07
 
 ### Added
@@ -163,7 +172,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.4...v0.4.0
