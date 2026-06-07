@@ -177,6 +177,16 @@ function registerSettings() {
     default: false,
   });
 
+  game.settings.register(MODULE_ID, "suggestionsEnabled", {
+    name: "CLAUDE-MOD.Settings.SuggestionsEnabled",
+    hint: "CLAUDE-MOD.Settings.SuggestionsEnabledHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
+  });
+
   game.settings.register(MODULE_ID, "useCampaignAssistant", {
     name: "CLAUDE-MOD.Settings.UseCampaignAssistant",
     hint: "CLAUDE-MOD.Settings.UseCampaignAssistantHint",

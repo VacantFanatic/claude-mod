@@ -2,6 +2,7 @@ import { ANTHROPIC_API_URL, ANTHROPIC_VERSION, MODULE_ID } from "../constants.js
 import { getApiKey } from "../settings/api-key.js";
 import { buildJournalSystemSection } from "./context-builder.js";
 import { appendConversationLog } from "../journal/journal-service.js";
+import { buildSuggestionsSystemInstruction } from "./suggestion-parser.js";
 
 export class ClaudeService {
   static #instance = null;
@@ -12,6 +13,9 @@ export class ClaudeService {
   /** Cached journal block for the current conversation (cleared on reset). */
   #sessionJournalSystem = "";
 
+  /** Whether to ask Claude for structured document suggestions this conversation. */
+  #sessionSuggestDocuments = false;
+
   static getInstance() {
     if (!this.#instance) this.#instance = new ClaudeService();
     return this.#instance;
@@ -20,6 +24,7 @@ export class ClaudeService {
   resetHistory() {
     this.#history = [];
     this.#sessionJournalSystem = "";
+    this.#sessionSuggestDocuments = false;
   }
 
   /**
@@ -31,10 +36,10 @@ export class ClaudeService {
 
   /**
    * @param {string} userText
-   * @param {{ resetHistory?: boolean }} [options]
+   * @param {{ resetHistory?: boolean, suggestDocuments?: boolean }} [options]
    * @returns {Promise<{ text: string, model: string, usage?: object }>}
    */
-  async sendMessage(userText, { resetHistory = false } = {}) {
+  async sendMessage(userText, { resetHistory = false, suggestDocuments = false } = {}) {
     if (resetHistory) this.resetHistory();
 
     const apiKey = getApiKey();
@@ -50,6 +55,7 @@ export class ClaudeService {
     if (this.#history.length === 0) {
       const { systemSection } = await buildJournalSystemSection();
       this.#sessionJournalSystem = systemSection;
+      this.#sessionSuggestDocuments = Boolean(suggestDocuments);
     }
 
     this.#history.push({ role: "user", content: trimmed });
@@ -130,6 +136,9 @@ export class ClaudeService {
     const userPrompt = game.settings.get(MODULE_ID, "systemPrompt")?.trim();
     if (userPrompt) parts.push(userPrompt);
     if (this.#sessionJournalSystem) parts.push(this.#sessionJournalSystem);
+    if (this.#sessionSuggestDocuments && game.settings.get(MODULE_ID, "suggestionsEnabled")) {
+      parts.push(buildSuggestionsSystemInstruction());
+    }
     return parts.length ? parts.join("\n\n") : undefined;
   }
 

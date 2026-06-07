@@ -1,4 +1,9 @@
 import { ClaudeService } from "../api/claude-service.js";
+import {
+  createSuggestionsFromRaw,
+  parseAssistantResponse,
+  removeSuggestion,
+} from "../api/suggestion-parser.js";
 import { getWorldSummary } from "../api/world-summary-service.js";
 import {
   appendMessage,
@@ -9,6 +14,7 @@ import {
 import { formatPromptChatContent, formatResponseChatContent } from "../chat/chat-format.js";
 import {
   createAssistantJournal,
+  createAssistantJournalFromSuggestion,
   getQuickCreateTypes,
   getRecentlyCreated,
   openAssistantDocument,
@@ -45,6 +51,10 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
       openRecent: CampaignAssistantApplication.#onOpenRecent,
       openKnowledgeBase: CampaignAssistantApplication.#onOpenKnowledgeBase,
       openPlayMaterials: CampaignAssistantApplication.#onOpenPlayMaterials,
+      acceptSuggestion: CampaignAssistantApplication.#onAcceptSuggestion,
+      dismissSuggestion: CampaignAssistantApplication.#onDismissSuggestion,
+      acceptAllSuggestions: CampaignAssistantApplication.#onAcceptAllSuggestions,
+      dismissAllSuggestions: CampaignAssistantApplication.#onDismissAllSuggestions,
     },
   };
 
@@ -62,7 +72,8 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     this.messages = messagesFromHistory(ClaudeService.getInstance().getHistory());
     this.loading = false;
     this.sidebarOpen = true;
-    this.suggestionCount = 0;
+    /** @type {Array<{ id: string, type: string, title: string, tags: string[], tagLabels: string, content: string, icon: string, snippet: string }>} */
+    this.suggestions = [];
     /** @type {{ text: string, truncated: boolean, journalCount: number }} */
     this.worldSummary = { text: "", truncated: false, journalCount: 0 };
     this.worldSummaryLoaded = false;
@@ -82,7 +93,14 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     context.loading = this.loading;
     context.hasApiKey = hasApiKey();
     context.sidebarOpen = this.sidebarOpen;
-    context.suggestionCount = this.suggestionCount;
+    context.suggestions = this.suggestions.map((suggestion) => ({
+      ...suggestion,
+      snippet:
+        suggestion.content.length > 120
+          ? `${suggestion.content.slice(0, 120).trimEnd()}…`
+          : suggestion.content,
+    }));
+    context.suggestionCount = this.suggestions.length;
     context.worldSummary = this.worldSummary;
     context.recentlyCreated = getRecentlyCreated(5);
     context.quickCreateTypes = getQuickCreateTypes().map((type) => ({
@@ -164,8 +182,19 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     this.scrollChatToBottom();
 
     try {
-      const result = await ClaudeService.getInstance().sendMessage(message);
-      this.messages = appendMessage(this.messages, "assistant", result.text);
+      const suggestDocuments =
+        game.settings.get(MODULE_ID, "suggestionsEnabled") &&
+        ClaudeService.getInstance().getHistory().length === 0;
+      const result = await ClaudeService.getInstance().sendMessage(message, { suggestDocuments });
+      const parsed = parseAssistantResponse(result.text);
+      this.messages = appendMessage(this.messages, "assistant", parsed.text);
+
+      if (parsed.suggestions.length) {
+        this.suggestions = [
+          ...this.suggestions,
+          ...createSuggestionsFromRaw(parsed.suggestions),
+        ];
+      }
 
       if (game.settings.get(MODULE_ID, "echoToChat")) {
         await postResponseToChat(message, result.text);
@@ -196,6 +225,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     event.preventDefault();
     ClaudeService.getInstance().resetHistory();
     this.messages = clearMessages();
+    this.suggestions = [];
     this.worldSummaryLoaded = false;
     await this.render({ force: true });
   }
@@ -265,6 +295,74 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   static async #onOpenPlayMaterials(event) {
     event.preventDefault();
     await openPlayMaterials();
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onAcceptSuggestion(event) {
+    event.preventDefault();
+    const card = event.target.closest("[data-suggestion-id]");
+    const id = card?.dataset.suggestionId;
+    if (!id) return;
+
+    const suggestion = this.suggestions.find((entry) => entry.id === id);
+    if (!suggestion) return;
+
+    try {
+      const journal = await createAssistantJournalFromSuggestion(suggestion);
+      this.suggestions = removeSuggestion(this.suggestions, id);
+      ui.notifications.info(
+        game.i18n.format("CLAUDE-MOD.CampaignAssistant.SuggestionAccepted", { name: journal.name }),
+      );
+      journal.sheet?.render(true);
+      await this.render({ force: true });
+    } catch (error) {
+      ui.notifications.error(error.message, { console: false });
+    }
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onDismissSuggestion(event) {
+    event.preventDefault();
+    const card = event.target.closest("[data-suggestion-id]");
+    const id = card?.dataset.suggestionId;
+    if (!id) return;
+
+    this.suggestions = removeSuggestion(this.suggestions, id);
+    await this.render({ force: true });
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onAcceptAllSuggestions(event) {
+    event.preventDefault();
+    if (!this.suggestions.length) return;
+
+    const pending = [...this.suggestions];
+    this.suggestions = [];
+    let created = 0;
+
+    for (const suggestion of pending) {
+      try {
+        await createAssistantJournalFromSuggestion(suggestion);
+        created += 1;
+      } catch (error) {
+        console.warn(`${MODULE_ID} | Failed to accept suggestion`, error);
+      }
+    }
+
+    if (created > 0) {
+      ui.notifications.info(
+        game.i18n.format("CLAUDE-MOD.CampaignAssistant.SuggestionsAcceptedAll", { count: created }),
+      );
+    }
+
+    await this.render({ force: true });
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onDismissAllSuggestions(event) {
+    event.preventDefault();
+    this.suggestions = [];
+    await this.render({ force: true });
   }
 }
 

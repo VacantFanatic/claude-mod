@@ -97,9 +97,48 @@
   <aside class="claude-mod-assistant-sidebar">
     <section class="claude-mod-sidebar-section claude-mod-suggested-docs">
       <header class="claude-mod-sidebar-header">
-        <span>{{localize "CLAUDE-MOD.CampaignAssistant.SuggestedDocuments"}} (0)</span>
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.SuggestedDocuments"}} ({{suggestionCount}})</span>
       </header>
-      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+
+      {{#if suggestions.length}}
+      <div class="claude-mod-suggestion-actions">
+        <button type="button" class="claude-mod-suggestion-action claude-mod-suggestion-action--accept" data-action="acceptAllSuggestions">
+          <i class="fa-solid fa-check"></i> {{localize "CLAUDE-MOD.CampaignAssistant.AcceptAll"}}
+        </button>
+        <button type="button" class="claude-mod-suggestion-action" data-action="dismissAllSuggestions">
+          {{localize "CLAUDE-MOD.CampaignAssistant.DismissAll"}}
+        </button>
+      </div>
+
+      <ul class="claude-mod-suggestion-list">
+        {{#each suggestions}}
+        <li class="claude-mod-suggestion-card" data-suggestion-id="{{id}}">
+          <div class="claude-mod-suggestion-card-main">
+            <i class="fa-solid {{icon}}"></i>
+            <div class="claude-mod-suggestion-card-body">
+              <span class="claude-mod-suggestion-title">{{title}}</span>
+              {{#if tagLabels}}
+              <span class="claude-mod-suggestion-tags">{{tagLabels}}</span>
+              {{/if}}
+              {{#if snippet}}
+              <p class="claude-mod-suggestion-snippet">{{snippet}}</p>
+              {{/if}}
+            </div>
+          </div>
+          <div class="claude-mod-suggestion-card-actions">
+            <button type="button" class="claude-mod-icon-button claude-mod-suggestion-accept" data-action="acceptSuggestion" data-suggestion-id="{{id}}" title="{{localize "CLAUDE-MOD.CampaignAssistant.AcceptSuggestion"}}">
+              <i class="fa-solid fa-check"></i>
+            </button>
+            <button type="button" class="claude-mod-icon-button" data-action="dismissSuggestion" data-suggestion-id="{{id}}" title="{{localize "CLAUDE-MOD.CampaignAssistant.DismissSuggestion"}}">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.SuggestionsEmpty"}}</p>
+      {{/if}}
     </section>
 
     <section class="claude-mod-sidebar-section claude-mod-recently-created">

@@ -248,6 +248,63 @@ export async function createAssistantJournal(type, name) {
 }
 
 /**
+ * @param {string} content
+ * @returns {string}
+ */
+export function formatSuggestionContent(content) {
+  const trimmed = String(content ?? "").trim();
+  if (!trimmed) return "<p></p>";
+  if (/<[a-z][\s\S]*>/i.test(trimmed)) return trimmed;
+
+  return trimmed
+    .split(/\n{2,}/)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+/**
+ * @param {{ type: string, title: string, content?: string }} suggestion
+ * @returns {Promise<JournalEntry>}
+ */
+export async function createAssistantJournalFromSuggestion(suggestion) {
+  const trimmed = suggestion.title.trim();
+  if (!trimmed) {
+    throw new Error(game.i18n.localize("CLAUDE-MOD.CampaignAssistant.NameRequired"));
+  }
+
+  const timestamp = Date.now();
+  const pageContent = formatSuggestionContent(suggestion.content);
+  const typeDef = QUICK_CREATE_TYPE_DEFS.find((entry) => entry.id === suggestion.type);
+  const pageName = typeDef
+    ? game.i18n.localize(typeDef.labelKey)
+    : game.i18n.localize("CLAUDE-MOD.CampaignAssistant.QuickCreateDefaultPage");
+
+  const journal = await JournalEntry.create({
+    name: trimmed,
+    folder: null,
+    ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER },
+    flags: {
+      [MODULE_ID]: {
+        [ASSISTANT_CREATED_FLAG]: timestamp,
+        [ASSISTANT_CREATE_TYPE_FLAG]: suggestion.type,
+      },
+    },
+    pages: [
+      {
+        name: pageName,
+        type: "text",
+        text: {
+          content: pageContent,
+          format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML,
+        },
+      },
+    ],
+  });
+
+  return journal;
+}
+
+/**
  * @param {string} documentType
  * @param {string} documentId
  * @param {string} [parentId]

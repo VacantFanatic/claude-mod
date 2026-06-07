@@ -496,3 +496,100 @@
 .claude-mod-quick-create-dialog input[type="text"] {
   width: 100%;
 }
+
+.claude-mod-suggestion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.claude-mod-suggestion-action {
+  padding: 0.25rem 0.45rem;
+  border: none;
+  background: none;
+  color: var(--color-text-light-emphasis);
+  font-size: var(--font-size-10, 0.625rem);
+  text-decoration: underline;
+}
+
+.claude-mod-suggestion-action--accept {
+  color: var(--color-text-hyperlink);
+}
+
+.claude-mod-suggestion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.claude-mod-suggestion-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding: 0.5rem;
+  border: 1px solid var(--claude-mod-panel-border);
+  border-radius: 8px;
+  background: var(--color-bg-app, rgb(0 0 0 / 10%));
+}
+
+.claude-mod-suggestion-card-main {
+  display: flex;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.claude-mod-suggestion-card-main > i {
+  color: var(--claude-mod-prompt-accent);
+  margin-top: 0.15rem;
+}
+
+.claude-mod-suggestion-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.claude-mod-suggestion-title {
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.claude-mod-suggestion-tags {
+  font-size: var(--font-size-10, 0.625rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--claude-mod-prompt-accent);
+  opacity: 0.85;
+}
+
+.claude-mod-suggestion-snippet {
+  margin: 0;
+  font-size: var(--font-size-10, 0.625rem);
+  line-height: 1.35;
+  color: var(--color-text-light-emphasis);
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.claude-mod-suggestion-card-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.claude-mod-suggestion-accept:hover:not(:disabled) {
+  border-color: var(--claude-mod-accent);
+  color: var(--claude-mod-accent);
+}
