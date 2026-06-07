@@ -12,6 +12,9 @@ AGENTS.md
 Thumbs.db
 desktop.ini
 
+# Node (unit tests)
+node_modules/
+
 # Logs and temp
 *.log
 *.tmp

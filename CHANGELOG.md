@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-07
+
+### Added
+
+- **Campaign Assistant** — two-column GM window with scrollable chat transcript, message input, and **Your World So Far** journal excerpt panel
+- Collapsible sidebar shell with placeholder sections for suggested documents, recently created items, and quick create (future updates)
+- **Open Campaign Assistant by Default** world setting; scene control and `Ctrl+Shift+C` open the new window when enabled (compact Claude Query window remains available)
+- Module API: `openCampaignAssistant()`, `openPrimaryAssistantWindow()`
+- `ClaudeService.getHistory()` for UI transcript sync
+- Vitest unit tests for chat message state and world summary excerpt helpers
+
 ## [0.3.4] - 2026-06-03
 
 ### Changed
@@ -134,7 +145,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.4...v0.4.0
+[0.3.4]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.3...v0.3.4
 [0.1.9]: https://github.com/VacantFanatic/claude-mod/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/VacantFanatic/claude-mod/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/VacantFanatic/claude-mod/compare/v0.1.6...v0.1.7

@@ -3,6 +3,7 @@
 /* -------------------------------------------------------------------------- */
 
 .claude-mod.query-app,
+.claude-mod.campaign-assistant,
 .chat-message .message-content {
   --claude-mod-accent: #d97757;
   --claude-mod-accent-strong: #c96344;
