@@ -70,14 +70,28 @@
         <div class="claude-mod-panel-header-title">
           <i class="fa-solid fa-globe"></i>
           <span>{{localize "CLAUDE-MOD.CampaignAssistant.WorldTitle"}}</span>
+          {{#if worldSummary.source}}
+          <span class="claude-mod-world-summary-source claude-mod-world-summary-source--{{worldSummary.source}}">
+            {{#if (eq worldSummary.source "ai")}}
+              {{localize "CLAUDE-MOD.CampaignAssistant.WorldSourceAi"}}
+            {{else}}
+              {{localize "CLAUDE-MOD.CampaignAssistant.WorldSourceExcerpt"}}
+            {{/if}}
+          </span>
+          {{/if}}
         </div>
-        <button type="button" class="claude-mod-icon-button" data-action="refreshWorldSummary" title="{{localize "CLAUDE-MOD.CampaignAssistant.RefreshWorld"}}">
-          <i class="fa-solid fa-rotate"></i>
+        <button type="button" class="claude-mod-icon-button" data-action="refreshWorldSummary" title="{{localize "CLAUDE-MOD.CampaignAssistant.RefreshWorld"}}" {{#if worldSummaryLoading}}disabled{{/if}}>
+          <i class="fa-solid fa-rotate{{#if worldSummaryLoading}} fa-spin{{/if}}"></i>
         </button>
       </header>
 
       <div class="claude-mod-world-summary-body">
-        {{#if worldSummary.text}}
+        {{#if worldSummaryLoading}}
+          <p class="claude-mod-world-summary-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            {{localize "CLAUDE-MOD.CampaignAssistant.WorldLoading"}}
+          </p>
+        {{else if worldSummary.text}}
           <p class="claude-mod-world-summary-text">{{worldSummary.text}}</p>
           {{#if worldSummary.truncated}}
           <p class="claude-mod-world-summary-note">{{localize "CLAUDE-MOD.CampaignAssistant.WorldTruncated"}}</p>
@@ -89,7 +103,7 @@
 
       <footer class="claude-mod-world-summary-footer">
         <i class="fa-solid fa-lightbulb"></i>
-        <span>{{localize "CLAUDE-MOD.CampaignAssistant.WorldFollowUp"}}</span>
+        <span>{{#if worldSummary.followUp}}{{worldSummary.followUp}}{{else}}{{localize "CLAUDE-MOD.CampaignAssistant.WorldFollowUp"}}{{/if}}</span>
       </footer>
     </section>
   </main>

@@ -26,6 +26,13 @@ export const JOURNAL_CONTEXT_MODE_CHOICES = {
 };
 
 export const JOURNAL_CONTEXT_MODE_DEFAULT = "claudeOnly";
+
+/** @type {Record<string, string>} */
+export const WORLD_SUMMARY_MODE_CHOICES = {
+  excerpt: "CLAUDE-MOD.Settings.WorldSummaryModeExcerpt",
+  ai: "CLAUDE-MOD.Settings.WorldSummaryModeAi",
+  hybrid: "CLAUDE-MOD.Settings.WorldSummaryModeHybrid",
+};
 export const CONTEXT_PINNED_FLAG = "contextPinned";
 export const ASSISTANT_CREATED_FLAG = "assistantCreated";
 export const ASSISTANT_CREATE_TYPE_FLAG = "assistantCreateType";

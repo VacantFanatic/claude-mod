@@ -359,6 +359,42 @@
   margin-top: 0.1rem;
 }
 
+.claude-mod-world-summary-source {
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: var(--font-size-9, 0.5625rem);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.claude-mod-world-summary-source--excerpt {
+  background: rgb(255 255 255 / 8%);
+  color: var(--color-text-light-emphasis);
+  opacity: 0.85;
+}
+
+.claude-mod-world-summary-source--ai {
+  background: rgb(74 158 255 / 18%);
+  color: var(--claude-mod-prompt-accent);
+}
+
+.claude-mod-world-summary-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: var(--font-size-12);
+  color: var(--color-text-light-emphasis);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.claude-mod-world-summary-loading .fa-spinner {
+  color: var(--claude-mod-accent);
+}
+
 /* -------------------------------------------------------------------------- */
 /* Sidebar                                                                    */
 /* -------------------------------------------------------------------------- */

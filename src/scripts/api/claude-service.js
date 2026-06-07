@@ -128,6 +128,78 @@ export class ClaudeService {
   }
 
   /**
+   * One-off API request that does not use or modify conversation history.
+   * @param {string} userText
+   * @param {{ system?: string, maxTokens?: number }} [options]
+   */
+  async sendStandaloneMessage(userText, { system, maxTokens } = {}) {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.NoApiKey"));
+    }
+
+    const trimmed = userText.trim();
+    if (!trimmed) {
+      throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.EmptyPrompt"));
+    }
+
+    /** @type {Record<string, unknown>} */
+    const body = {
+      model: game.settings.get(MODULE_ID, "model"),
+      max_tokens: maxTokens ?? Math.min(game.settings.get(MODULE_ID, "maxTokens") ?? 1024, 768),
+      messages: [{ role: "user", content: trimmed }],
+    };
+
+    if (system?.trim()) body.system = system.trim();
+
+    const temperature = game.settings.get(MODULE_ID, "temperature");
+    if (Number.isFinite(temperature)) body.temperature = temperature;
+
+    let response;
+    try {
+      response = await fetch(ANTHROPIC_API_URL, {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": ANTHROPIC_VERSION,
+          "content-type": "application/json",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.CorsBlocked"));
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.ApiFailure"));
+    }
+
+    if (!response.ok) {
+      throw new Error(this.#parseError(data, response.status));
+    }
+
+    const text = (data.content ?? [])
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("\n")
+      .trim();
+
+    if (!text) {
+      throw new Error(game.i18n.localize("CLAUDE-MOD.Errors.NoResponse"));
+    }
+
+    return {
+      text,
+      model: data.model ?? String(body.model),
+      usage: data.usage,
+    };
+  }
+
+  /**
    * Merges the configured system prompt with cached journal context for this conversation.
    * @returns {string|undefined}
    */

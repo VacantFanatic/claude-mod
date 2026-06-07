@@ -74,9 +74,16 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     this.sidebarOpen = true;
     /** @type {Array<{ id: string, type: string, title: string, tags: string[], tagLabels: string, content: string, icon: string, snippet: string }>} */
     this.suggestions = [];
-    /** @type {{ text: string, truncated: boolean, journalCount: number }} */
-    this.worldSummary = { text: "", truncated: false, journalCount: 0 };
+    /** @type {{ text: string, truncated: boolean, journalCount: number, source: "excerpt"|"ai", followUp: string }} */
+    this.worldSummary = {
+      text: "",
+      truncated: false,
+      journalCount: 0,
+      source: "excerpt",
+      followUp: "",
+    };
     this.worldSummaryLoaded = false;
+    this.worldSummaryLoading = false;
   }
 
   async _prepareContext(options) {
@@ -102,6 +109,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     }));
     context.suggestionCount = this.suggestions.length;
     context.worldSummary = this.worldSummary;
+    context.worldSummaryLoading = this.worldSummaryLoading;
     context.recentlyCreated = getRecentlyCreated(5);
     context.quickCreateTypes = getQuickCreateTypes().map((type) => ({
       ...type,
@@ -133,13 +141,24 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     await app.render({ force: true });
   }
 
-  async loadWorldSummary() {
+  async loadWorldSummary({ forceRefresh = false } = {}) {
+    this.worldSummaryLoading = true;
+    await this.render({ force: true });
+
     try {
-      this.worldSummary = await getWorldSummary();
+      this.worldSummary = await getWorldSummary({ forceRefresh });
       this.worldSummaryLoaded = true;
     } catch (error) {
       console.warn(`${MODULE_ID} | Failed to load world summary`, error);
-      this.worldSummary = { text: "", truncated: false, journalCount: 0 };
+      this.worldSummary = {
+        text: "",
+        truncated: false,
+        journalCount: 0,
+        source: "excerpt",
+        followUp: "",
+      };
+    } finally {
+      this.worldSummaryLoading = false;
     }
   }
 
@@ -240,10 +259,14 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   /** @this {CampaignAssistantApplication} */
   static async #onRefreshWorldSummary(event) {
     event.preventDefault();
-    this.worldSummaryLoaded = false;
-    await this.loadWorldSummary();
+    await this.loadWorldSummary({ forceRefresh: true });
     await this.render({ force: true });
-    ui.notifications.info(game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldRefreshed"));
+
+    const messageKey =
+      this.worldSummary.source === "ai"
+        ? "CLAUDE-MOD.CampaignAssistant.WorldRefreshedAi"
+        : "CLAUDE-MOD.CampaignAssistant.WorldRefreshed";
+    ui.notifications.info(game.i18n.localize(messageKey));
   }
 
   /** @this {CampaignAssistantApplication} */
