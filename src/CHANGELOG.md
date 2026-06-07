@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-07
+
+### Changed
+
+- Repository layout: installable module files now live under `src/`; dev tooling (`package.json`, `tests/`) stays at the repo root
+- Release workflow zips `src/` only, so test and Node files are never packaged
+
 ## [0.4.0] - 2026-06-07
 
 ### Added
@@ -145,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.4...v0.4.0
 [0.3.4]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.3...v0.3.4
 [0.1.9]: https://github.com/VacantFanatic/claude-mod/compare/v0.1.8...v0.1.9

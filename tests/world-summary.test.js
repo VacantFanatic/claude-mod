@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildWorldExcerpt } from "../scripts/api/world-summary-service.js";
+import { buildWorldExcerpt } from "../src/scripts/api/world-summary-service.js";
 
 describe("buildWorldExcerpt", () => {
   it("returns empty text when there are no journal entries", () => {
