@@ -65,14 +65,14 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     this.suggestionCount = 0;
     /** @type {{ text: string, truncated: boolean, journalCount: number }} */
     this.worldSummary = { text: "", truncated: false, journalCount: 0 };
-    this.#worldSummaryLoaded = false;
+    this.worldSummaryLoaded = false;
   }
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    if (!this.#worldSummaryLoaded) {
-      await this.#loadWorldSummary();
+    if (!this.worldSummaryLoaded) {
+      await this.loadWorldSummary();
     }
 
     context.messages = this.messages.map((message) => ({
@@ -94,8 +94,8 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
 
   _onRender(context, options) {
     super._onRender(context, options);
-    this.#bindChatInput();
-    this.#scrollChatToBottom();
+    this.bindChatInput();
+    this.scrollChatToBottom();
   }
 
   static async open() {
@@ -115,17 +115,17 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     await app.render({ force: true });
   }
 
-  async #loadWorldSummary() {
+  async loadWorldSummary() {
     try {
       this.worldSummary = await getWorldSummary();
-      this.#worldSummaryLoaded = true;
+      this.worldSummaryLoaded = true;
     } catch (error) {
       console.warn(`${MODULE_ID} | Failed to load world summary`, error);
       this.worldSummary = { text: "", truncated: false, journalCount: 0 };
     }
   }
 
-  #bindChatInput() {
+  bindChatInput() {
     const textarea = this.element?.querySelector('.claude-mod-chat-input textarea[name="message"]');
     if (!textarea || textarea.dataset.bound === "true") return;
 
@@ -133,11 +133,11 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     textarea.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" || event.shiftKey) return;
       event.preventDefault();
-      this.#submitMessage(textarea);
+      void this.submitMessage(textarea);
     });
   }
 
-  #scrollChatToBottom(force = true) {
+  scrollChatToBottom(force = true) {
     const transcript = this.element?.querySelector("[data-chat-transcript]");
     if (!transcript) return;
 
@@ -153,7 +153,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     }
   }
 
-  async #submitMessage(input) {
+  async submitMessage(input) {
     const message = input?.value?.trim() ?? "";
     if (!message || this.loading) return;
 
@@ -161,7 +161,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     this.messages = appendMessage(this.messages, "user", message);
     this.loading = true;
     await this.render({ force: true });
-    this.#scrollChatToBottom();
+    this.scrollChatToBottom();
 
     try {
       const result = await ClaudeService.getInstance().sendMessage(message);
@@ -180,7 +180,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     } finally {
       this.loading = false;
       await this.render({ force: true });
-      this.#scrollChatToBottom();
+      this.scrollChatToBottom();
     }
   }
 
@@ -188,7 +188,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   static async #onSendMessage(event) {
     event.preventDefault();
     const input = this.element?.querySelector('.claude-mod-chat-input textarea[name="message"]');
-    await this.#submitMessage(input);
+    await this.submitMessage(input);
   }
 
   /** @this {CampaignAssistantApplication} */
@@ -196,7 +196,7 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     event.preventDefault();
     ClaudeService.getInstance().resetHistory();
     this.messages = clearMessages();
-    this.#worldSummaryLoaded = false;
+    this.worldSummaryLoaded = false;
     await this.render({ force: true });
   }
 
@@ -210,8 +210,8 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
   /** @this {CampaignAssistantApplication} */
   static async #onRefreshWorldSummary(event) {
     event.preventDefault();
-    this.#worldSummaryLoaded = false;
-    await this.#loadWorldSummary();
+    this.worldSummaryLoaded = false;
+    await this.loadWorldSummary();
     await this.render({ force: true });
     ui.notifications.info(game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldRefreshed"));
   }
