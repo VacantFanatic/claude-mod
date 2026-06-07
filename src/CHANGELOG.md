@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-07
+
+### Added
+
+- **AI world summary** for Campaign Assistant **Your World So Far** panel — Claude generates a concise campaign summary from journal context
+- **World Summary Mode** world setting: journal excerpt only, always AI summary, or hybrid (excerpt on open, AI when you click refresh)
+- AI summaries are cached per world until journal content changes; refresh button shows a loading state and source badge (Excerpt / AI Summary)
+- Dynamic follow-up question from AI summaries in the panel footer
+- `ClaudeService.sendStandaloneMessage()` for one-off API calls without polluting chat history
+- Vitest coverage for AI summary mode selection, response parsing, and source hashing
+
 ## [0.6.0] - 2026-06-07
 
 ### Added

@@ -1,7 +1,14 @@
 import { registerApiKeySetting } from "./apps/api-key-config-app.js";
 import { registerJournalContextSettings } from "./apps/journal-context-config-app.js";
 import { registerChatCommands } from "./chat/chat-commands.js";
-import { DEFAULT_MODEL, DEPRECATED_MODELS, JOURNAL_CONTEXT_MODE_DEFAULT, MODEL_CHOICES, MODULE_ID } from "./constants.js";
+import {
+  DEFAULT_MODEL,
+  DEPRECATED_MODELS,
+  JOURNAL_CONTEXT_MODE_DEFAULT,
+  MODEL_CHOICES,
+  MODULE_ID,
+  WORLD_SUMMARY_MODE_CHOICES,
+} from "./constants.js";
 import {
   ensureClaudeJournal,
   getClaudeJournal,
@@ -195,6 +202,25 @@ function registerSettings() {
     restricted: true,
     type: Boolean,
     default: true,
+  });
+
+  game.settings.register(MODULE_ID, "worldSummaryMode", {
+    name: "CLAUDE-MOD.Settings.WorldSummaryMode",
+    hint: "CLAUDE-MOD.Settings.WorldSummaryModeHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: String,
+    choices: WORLD_SUMMARY_MODE_CHOICES,
+    default: "hybrid",
+  });
+
+  game.settings.register(MODULE_ID, "worldSummaryCache", {
+    scope: "world",
+    config: false,
+    restricted: true,
+    type: Object,
+    default: {},
   });
 
   game.settings.register(MODULE_ID, "claudeJournalId", {
