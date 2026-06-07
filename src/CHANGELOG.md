@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-07
+
+### Added
+
+- **Suggested Documents** sidebar in Campaign Assistant — parses structured journal suggestions from Claude replies, with per-card accept/dismiss and **Accept All** / **Dismiss All**
+- Accepted suggestions create journal entries with the proposed content; suggestions are stripped from the chat transcript
+- **Suggest Journal Documents** world setting (default on)
+- Vitest coverage for suggestion parsing helpers
+
 ## [0.5.2] - 2026-06-07
 
 ### Fixed
@@ -183,7 +192,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...v0.5.0
