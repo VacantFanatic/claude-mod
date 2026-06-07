@@ -21,13 +21,23 @@ import { registerJournalSheetHooks } from "./journal/journal-sheet-hooks.js";
 import { migrateWorldApiKey } from "./settings/api-key.js";
 
 async function openQueryWindow() {
-  const { ClaudeQueryApplication } = await import("./apps/claude-query-app.js");
-  return ClaudeQueryApplication.open();
+  try {
+    const { ClaudeQueryApplication } = await import("./apps/claude-query-app.js");
+    return await ClaudeQueryApplication.open();
+  } catch (error) {
+    console.error(`${MODULE_ID} | Failed to open Claude Query window`, error);
+    ui.notifications.error(error.message, { console: false });
+  }
 }
 
 async function openCampaignAssistant() {
-  const { CampaignAssistantApplication } = await import("./apps/campaign-assistant-app.js");
-  return CampaignAssistantApplication.open();
+  try {
+    const { CampaignAssistantApplication } = await import("./apps/campaign-assistant-app.js");
+    return await CampaignAssistantApplication.open();
+  } catch (error) {
+    console.error(`${MODULE_ID} | Failed to open Campaign Assistant`, error);
+    ui.notifications.error(error.message, { console: false });
+  }
 }
 
 function openPrimaryAssistantWindow() {

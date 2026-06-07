@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-06-07
+
+### Fixed
+
+- `/claude` chat command and scene-control button stopped working after v0.7.0 — slash command registration now runs immediately during `init` instead of queuing a nested `Hooks.once("init")` that never fires
+- Campaign Assistant hung on open — `loadWorldSummary()` no longer calls `render()` from `_prepareContext`, which caused infinite render recursion
+- World summary source badge no longer relies on a Handlebars `eq` helper that may be unavailable in all Foundry builds
+
 ## [0.7.0] - 2026-06-07
 
 ### Added
