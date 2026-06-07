@@ -23,6 +23,13 @@ export class ClaudeService {
   }
 
   /**
+   * @returns {Array<{ role: string, content: string }>}
+   */
+  getHistory() {
+    return this.#history.map((entry) => ({ ...entry }));
+  }
+
+  /**
    * @param {string} userText
    * @param {{ resetHistory?: boolean }} [options]
    * @returns {Promise<{ text: string, model: string, usage?: object }>}

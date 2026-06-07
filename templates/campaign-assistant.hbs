@@ -1,0 +1,119 @@
+<section class="claude-mod-campaign-assistant {{#unless sidebarOpen}}sidebar-collapsed{{/unless}}">
+  <header class="claude-mod-assistant-header">
+    <div class="claude-mod-assistant-title">
+      <i class="fa-solid fa-sparkles"></i>
+      <h2>{{localize "CLAUDE-MOD.CampaignAssistant.Title"}}</h2>
+      {{#if suggestionCount}}
+      <span class="claude-mod-suggestion-badge">{{suggestionCount}} {{localize "CLAUDE-MOD.CampaignAssistant.Suggestions"}}</span>
+      {{/if}}
+    </div>
+    <div class="claude-mod-assistant-header-actions">
+      <button type="button" class="claude-mod-icon-button" data-action="newConversation" title="{{localize "CLAUDE-MOD.NewConversation"}}" {{#if loading}}disabled{{/if}}>
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button type="button" class="claude-mod-icon-button" data-action="toggleSidebar" title="{{localize "CLAUDE-MOD.CampaignAssistant.ToggleSidebar"}}">
+        <i class="fa-solid {{#if sidebarOpen}}fa-chevron-right{{else}}fa-chevron-left{{/if}}"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="claude-mod-assistant-main">
+    <section class="claude-mod-chat-panel">
+      <header class="claude-mod-panel-header">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.ChatTitle"}}</span>
+      </header>
+
+      <div class="claude-mod-chat-transcript" data-chat-transcript>
+        {{#if messages.length}}
+          {{#each messages}}
+          <article class="claude-mod-transcript-message claude-mod-transcript-message--{{role}}">
+            <div class="claude-mod-transcript-bubble">{{{contentHtml}}}</div>
+          </article>
+          {{/each}}
+        {{else}}
+          <p class="claude-mod-chat-empty">{{localize "CLAUDE-MOD.CampaignAssistant.ChatEmpty"}}</p>
+        {{/if}}
+
+        {{#if loading}}
+        <article class="claude-mod-transcript-message claude-mod-transcript-message--assistant">
+          <div class="claude-mod-transcript-bubble claude-mod-typing-indicator">
+            <span></span><span></span><span></span>
+          </div>
+        </article>
+        {{/if}}
+      </div>
+
+      {{#unless hasApiKey}}
+      <p class="claude-mod-warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        {{localize "CLAUDE-MOD.NoApiKeyWarning"}}
+      </p>
+      {{/unless}}
+
+      <form class="claude-mod-chat-input" data-action="sendMessage">
+        <textarea
+          name="message"
+          rows="1"
+          placeholder="{{localize "CLAUDE-MOD.CampaignAssistant.MessagePlaceholder"}}"
+          {{#unless hasApiKey}}disabled{{/unless}}
+          {{#if loading}}disabled{{/if}}
+        ></textarea>
+        <button type="submit" data-action="sendMessage" {{#unless hasApiKey}}disabled{{/unless}} {{#if loading}}disabled{{/if}}>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </section>
+
+    <section class="claude-mod-world-summary">
+      <header class="claude-mod-panel-header">
+        <div class="claude-mod-panel-header-title">
+          <i class="fa-solid fa-globe"></i>
+          <span>{{localize "CLAUDE-MOD.CampaignAssistant.WorldTitle"}}</span>
+        </div>
+        <button type="button" class="claude-mod-icon-button" data-action="refreshWorldSummary" title="{{localize "CLAUDE-MOD.CampaignAssistant.RefreshWorld"}}">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </header>
+
+      <div class="claude-mod-world-summary-body">
+        {{#if worldSummary.text}}
+          <p class="claude-mod-world-summary-text">{{worldSummary.text}}</p>
+          {{#if worldSummary.truncated}}
+          <p class="claude-mod-world-summary-note">{{localize "CLAUDE-MOD.CampaignAssistant.WorldTruncated"}}</p>
+          {{/if}}
+        {{else}}
+          <p class="claude-mod-world-summary-empty">{{localize "CLAUDE-MOD.CampaignAssistant.WorldEmpty"}}</p>
+        {{/if}}
+      </div>
+
+      <footer class="claude-mod-world-summary-footer">
+        <i class="fa-solid fa-lightbulb"></i>
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.WorldFollowUp"}}</span>
+      </footer>
+    </section>
+  </main>
+
+  <aside class="claude-mod-assistant-sidebar">
+    <section class="claude-mod-sidebar-section claude-mod-suggested-docs">
+      <header class="claude-mod-sidebar-header">
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.SuggestedDocuments"}} (0)</span>
+      </header>
+      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+    </section>
+
+    <section class="claude-mod-sidebar-section claude-mod-recently-created">
+      <header class="claude-mod-sidebar-header">
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.RecentlyCreated"}} (0)</span>
+      </header>
+      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+    </section>
+
+    <section class="claude-mod-sidebar-section claude-mod-quick-create">
+      <header class="claude-mod-sidebar-header">
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.QuickCreate"}}</span>
+      </header>
+      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+    </section>
+  </aside>
+</section>

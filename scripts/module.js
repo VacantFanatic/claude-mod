@@ -1,3 +1,4 @@
+import { CampaignAssistantApplication } from "./apps/campaign-assistant-app.js";
 import { ClaudeQueryApplication } from "./apps/claude-query-app.js";
 import { registerApiKeySetting } from "./apps/api-key-config-app.js";
 import { registerJournalContextSettings } from "./apps/journal-context-config-app.js";
@@ -15,6 +16,14 @@ import { registerJournalSheetHooks } from "./journal/journal-sheet-hooks.js";
 import { migrateWorldApiKey } from "./settings/api-key.js";
 
 const openQueryWindow = () => ClaudeQueryApplication.open();
+const openCampaignAssistant = () => CampaignAssistantApplication.open();
+
+function openPrimaryAssistantWindow() {
+  if (game.settings.get(MODULE_ID, "useCampaignAssistant")) {
+    return openCampaignAssistant();
+  }
+  return openQueryWindow();
+}
 
 Hooks.once("init", () => {
   const version = game.modules.get(MODULE_ID)?.version ?? "unknown";
@@ -29,6 +38,8 @@ Hooks.once("init", () => {
 Hooks.once("ready", async () => {
   game.modules.get(MODULE_ID).api = {
     openQueryWindow,
+    openCampaignAssistant,
+    openPrimaryAssistantWindow,
     openClaudeJournal,
     getClaudeJournal,
     ensureClaudeJournal,
@@ -152,6 +163,16 @@ function registerSettings() {
     default: false,
   });
 
+  game.settings.register(MODULE_ID, "useCampaignAssistant", {
+    name: "CLAUDE-MOD.Settings.UseCampaignAssistant",
+    hint: "CLAUDE-MOD.Settings.UseCampaignAssistantHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
+  });
+
   game.settings.register(MODULE_ID, "claudeJournalId", {
     scope: "world",
     config: false,
@@ -198,7 +219,7 @@ function registerKeybindings() {
     editable: [{ key: "KeyC", modifiers: ["CONTROL", "SHIFT"] }],
     restricted: true,
     onDown: () => {
-      openQueryWindow();
+      openPrimaryAssistantWindow();
       return true;
     },
   });
@@ -216,12 +237,12 @@ function onGetSceneControlButtons(controls) {
   notes.tools["claude-query"] = {
     name: "claude-query",
     title: "CLAUDE-MOD.SceneControlTitle",
-    icon: "fa-solid fa-message",
+    icon: "fa-solid fa-wand-magic-sparkles",
     order: 6,
     button: true,
     visible: game.user.isGM,
     onChange: () => {
-      void openQueryWindow();
+      void openPrimaryAssistantWindow();
     },
   };
 }

@@ -1,0 +1,213 @@
+import { ClaudeService } from "../api/claude-service.js";
+import { getWorldSummary } from "../api/world-summary-service.js";
+import {
+  appendMessage,
+  clearMessages,
+  messagesFromHistory,
+  shouldScrollToBottom,
+} from "../chat/message-state.js";
+import { formatPromptChatContent, formatResponseChatContent } from "../chat/chat-format.js";
+import { MODULE_ID } from "../constants.js";
+import { hasApiKey } from "../settings/api-key.js";
+
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+
+export class CampaignAssistantApplication extends HandlebarsApplicationMixin(ApplicationV2) {
+  /** @type {CampaignAssistantApplication|null} */
+  static #activeInstance = null;
+
+  static DEFAULT_OPTIONS = {
+    id: "claude-campaign-assistant-app",
+    classes: ["claude-mod", "campaign-assistant"],
+    position: {
+      width: 960,
+      height: 720,
+    },
+    window: {
+      resizable: true,
+      title: "CLAUDE-MOD.CampaignAssistant.WindowTitle",
+    },
+    actions: {
+      sendMessage: CampaignAssistantApplication.#onSendMessage,
+      newConversation: CampaignAssistantApplication.#onNewConversation,
+      toggleSidebar: CampaignAssistantApplication.#onToggleSidebar,
+      refreshWorldSummary: CampaignAssistantApplication.#onRefreshWorldSummary,
+    },
+  };
+
+  static PARTS = {
+    content: {
+      template: "modules/claude-mod/templates/campaign-assistant.hbs",
+      scrollable: [".claude-mod-chat-transcript", ".claude-mod-world-summary-body"],
+    },
+  };
+
+  constructor(options = {}) {
+    super(options);
+    CampaignAssistantApplication.#activeInstance = this;
+    /** @type {Array<{ id: string, role: "user"|"assistant", content: string, timestamp: number, contentHtml?: string }>} */
+    this.messages = messagesFromHistory(ClaudeService.getInstance().getHistory());
+    this.loading = false;
+    this.sidebarOpen = true;
+    this.suggestionCount = 0;
+    /** @type {{ text: string, truncated: boolean, journalCount: number }} */
+    this.worldSummary = { text: "", truncated: false, journalCount: 0 };
+    this.#worldSummaryLoaded = false;
+  }
+
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+
+    if (!this.#worldSummaryLoaded) {
+      await this.#loadWorldSummary();
+    }
+
+    context.messages = this.messages.map((message) => ({
+      ...message,
+      contentHtml: foundry.utils.escapeHTML(message.content).replace(/\n/g, "<br>"),
+    }));
+    context.loading = this.loading;
+    context.hasApiKey = hasApiKey();
+    context.sidebarOpen = this.sidebarOpen;
+    context.suggestionCount = this.suggestionCount;
+    context.worldSummary = this.worldSummary;
+    return context;
+  }
+
+  _onRender(context, options) {
+    super._onRender(context, options);
+    this.#bindChatInput();
+    this.#scrollChatToBottom();
+  }
+
+  static async open() {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("CLAUDE-MOD.Errors.GmOnly"));
+      return;
+    }
+
+    const existing = CampaignAssistantApplication.#activeInstance;
+    if (existing?.rendered) {
+      existing.bringToFront?.();
+      await existing.render({ force: true });
+      return;
+    }
+
+    const app = new CampaignAssistantApplication();
+    await app.render({ force: true });
+  }
+
+  async #loadWorldSummary() {
+    try {
+      this.worldSummary = await getWorldSummary();
+      this.#worldSummaryLoaded = true;
+    } catch (error) {
+      console.warn(`${MODULE_ID} | Failed to load world summary`, error);
+      this.worldSummary = { text: "", truncated: false, journalCount: 0 };
+    }
+  }
+
+  #bindChatInput() {
+    const textarea = this.element?.querySelector('.claude-mod-chat-input textarea[name="message"]');
+    if (!textarea || textarea.dataset.bound === "true") return;
+
+    textarea.dataset.bound = "true";
+    textarea.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" || event.shiftKey) return;
+      event.preventDefault();
+      this.#submitMessage(textarea);
+    });
+  }
+
+  #scrollChatToBottom(force = true) {
+    const transcript = this.element?.querySelector("[data-chat-transcript]");
+    if (!transcript) return;
+
+    if (
+      force ||
+      shouldScrollToBottom({
+        scrollTop: transcript.scrollTop,
+        scrollHeight: transcript.scrollHeight,
+        clientHeight: transcript.clientHeight,
+      })
+    ) {
+      transcript.scrollTop = transcript.scrollHeight;
+    }
+  }
+
+  async #submitMessage(input) {
+    const message = input?.value?.trim() ?? "";
+    if (!message || this.loading) return;
+
+    input.value = "";
+    this.messages = appendMessage(this.messages, "user", message);
+    this.loading = true;
+    await this.render({ force: true });
+    this.#scrollChatToBottom();
+
+    try {
+      const result = await ClaudeService.getInstance().sendMessage(message);
+      this.messages = appendMessage(this.messages, "assistant", result.text);
+
+      if (game.settings.get(MODULE_ID, "echoToChat")) {
+        await postResponseToChat(message, result.text);
+      }
+    } catch (error) {
+      ui.notifications.error(error.message, { console: false });
+      this.messages = appendMessage(
+        this.messages,
+        "assistant",
+        game.i18n.format("CLAUDE-MOD.CampaignAssistant.ErrorMessage", { error: error.message }),
+      );
+    } finally {
+      this.loading = false;
+      await this.render({ force: true });
+      this.#scrollChatToBottom();
+    }
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onSendMessage(event) {
+    event.preventDefault();
+    const input = this.element?.querySelector('.claude-mod-chat-input textarea[name="message"]');
+    await this.#submitMessage(input);
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onNewConversation(event) {
+    event.preventDefault();
+    ClaudeService.getInstance().resetHistory();
+    this.messages = clearMessages();
+    this.#worldSummaryLoaded = false;
+    await this.render({ force: true });
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onToggleSidebar(event) {
+    event.preventDefault();
+    this.sidebarOpen = !this.sidebarOpen;
+    await this.render({ force: true });
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onRefreshWorldSummary(event) {
+    event.preventDefault();
+    this.#worldSummaryLoaded = false;
+    await this.#loadWorldSummary();
+    await this.render({ force: true });
+    ui.notifications.info(game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldRefreshed"));
+  }
+}
+
+/**
+ * @param {string} prompt
+ * @param {string} response
+ */
+async function postResponseToChat(prompt, response) {
+  await ChatMessage.create({
+    user: game.user.id,
+    speaker: ChatMessage.getSpeaker({ alias: game.i18n.localize("CLAUDE-MOD.Chat.FromClaude") }),
+    content: `${formatPromptChatContent(prompt)}${formatResponseChatContent(response)}`,
+    whisper: [game.user.id],
+  });
+}
