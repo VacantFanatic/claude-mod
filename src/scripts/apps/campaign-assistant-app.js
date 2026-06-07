@@ -7,6 +7,15 @@ import {
   shouldScrollToBottom,
 } from "../chat/message-state.js";
 import { formatPromptChatContent, formatResponseChatContent } from "../chat/chat-format.js";
+import {
+  createAssistantJournal,
+  getQuickCreateTypes,
+  getRecentlyCreated,
+  openAssistantDocument,
+  openKnowledgeBase,
+  openPlayMaterials,
+  promptForDocumentName,
+} from "../journal/assistant-content-service.js";
 import { MODULE_ID } from "../constants.js";
 import { hasApiKey } from "../settings/api-key.js";
 
@@ -32,6 +41,10 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
       newConversation: CampaignAssistantApplication.#onNewConversation,
       toggleSidebar: CampaignAssistantApplication.#onToggleSidebar,
       refreshWorldSummary: CampaignAssistantApplication.#onRefreshWorldSummary,
+      quickCreate: CampaignAssistantApplication.#onQuickCreate,
+      openRecent: CampaignAssistantApplication.#onOpenRecent,
+      openKnowledgeBase: CampaignAssistantApplication.#onOpenKnowledgeBase,
+      openPlayMaterials: CampaignAssistantApplication.#onOpenPlayMaterials,
     },
   };
 
@@ -71,6 +84,11 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     context.sidebarOpen = this.sidebarOpen;
     context.suggestionCount = this.suggestionCount;
     context.worldSummary = this.worldSummary;
+    context.recentlyCreated = getRecentlyCreated(5);
+    context.quickCreateTypes = getQuickCreateTypes().map((type) => ({
+      ...type,
+      label: game.i18n.localize(type.labelKey),
+    }));
     return context;
   }
 
@@ -196,6 +214,57 @@ export class CampaignAssistantApplication extends HandlebarsApplicationMixin(App
     await this.#loadWorldSummary();
     await this.render({ force: true });
     ui.notifications.info(game.i18n.localize("CLAUDE-MOD.CampaignAssistant.WorldRefreshed"));
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onQuickCreate(event) {
+    event.preventDefault();
+    const button = event.target.closest("[data-create-type]");
+    const type = button?.dataset.createType;
+    if (!type) return;
+
+    const typeDef = getQuickCreateTypes().find((entry) => entry.id === type);
+    const title = game.i18n.format("CLAUDE-MOD.CampaignAssistant.QuickCreateTitle", {
+      type: game.i18n.localize(typeDef?.labelKey ?? "CLAUDE-MOD.CampaignAssistant.QuickCreate"),
+    });
+    const name = await promptForDocumentName(title);
+    if (!name) return;
+
+    try {
+      const journal = await createAssistantJournal(type, name);
+      ui.notifications.info(
+        game.i18n.format("CLAUDE-MOD.CampaignAssistant.Created", { name: journal.name }),
+      );
+      journal.sheet?.render(true);
+      await this.render({ force: true });
+    } catch (error) {
+      ui.notifications.error(error.message, { console: false });
+    }
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onOpenRecent(event) {
+    event.preventDefault();
+    const row = event.target.closest("[data-document-id]");
+    if (!row) return;
+
+    await openAssistantDocument(
+      row.dataset.documentType,
+      row.dataset.documentId,
+      row.dataset.parentId,
+    );
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onOpenKnowledgeBase(event) {
+    event.preventDefault();
+    await openKnowledgeBase();
+  }
+
+  /** @this {CampaignAssistantApplication} */
+  static async #onOpenPlayMaterials(event) {
+    event.preventDefault();
+    await openPlayMaterials();
   }
 }
 
