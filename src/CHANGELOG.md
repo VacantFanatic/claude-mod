@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-06-07
+
+### Fixed
+
+- Campaign Assistant failed to load with `Private field '#worldSummaryLoaded' must be declared in an enclosing class` — static action handlers now call public instance methods instead of illegal private field access
+
+### Added
+
+- `npm run check:syntax` validates every `src/scripts/**/*.js` file with Node's syntax checker
+- GitHub Actions **CI** workflow runs syntax checks and unit tests on pull requests and `main`
+
 ## [0.5.1] - 2026-06-07
 
 ### Fixed
@@ -172,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...v0.4.1
