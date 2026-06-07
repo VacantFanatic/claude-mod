@@ -5,7 +5,7 @@ import {
   createMessage,
   messagesFromHistory,
   shouldScrollToBottom,
-} from "../scripts/chat/message-state.js";
+} from "../src/scripts/chat/message-state.js";
 
 describe("createMessage", () => {
   it("creates a message with role, content, and id", () => {
