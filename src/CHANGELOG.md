@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-07
+
+### Added
+
+- **Recently Created** sidebar — lists the five most recent journals created via Campaign Assistant, with type icons and dates
+- **Quick Create** grid — ten journal templates (Session, NPC, Location, Story Arc, Encounter, Player Character, Lore, Scene Outline, Secrets & Clues, Magic Item)
+- Name prompt dialog when quick-creating; new journals open automatically after creation
+- **Knowledge Base** and **Play Materials** footer links (journal and actor/scene directories)
+- Module flags `assistantCreated` and `assistantCreateType` on quick-created journals
+- Vitest coverage for quick-create helpers and recent-item sorting
+
 ## [0.4.1] - 2026-06-07
 
 ### Changed
@@ -152,7 +163,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scene control button and `Ctrl+Shift+C` keybinding to open the query window
 - Stub `ContextBuilder` for future game-context injection
 
-[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/VacantFanatic/claude-mod/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/VacantFanatic/claude-mod/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.4...v0.4.0
 [0.3.4]: https://github.com/VacantFanatic/claude-mod/compare/v0.3.3...v0.3.4

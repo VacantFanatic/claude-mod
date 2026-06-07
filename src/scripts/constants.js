@@ -27,3 +27,5 @@ export const JOURNAL_CONTEXT_MODE_CHOICES = {
 
 export const JOURNAL_CONTEXT_MODE_DEFAULT = "claudeOnly";
 export const CONTEXT_PINNED_FLAG = "contextPinned";
+export const ASSISTANT_CREATED_FLAG = "assistantCreated";
+export const ASSISTANT_CREATE_TYPE_FLAG = "assistantCreateType";

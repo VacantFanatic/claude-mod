@@ -5,6 +5,10 @@ import { registerJournalContextSettings } from "./apps/journal-context-config-ap
 import { registerChatCommands } from "./chat/chat-commands.js";
 import { DEFAULT_MODEL, DEPRECATED_MODELS, JOURNAL_CONTEXT_MODE_DEFAULT, MODEL_CHOICES, MODULE_ID } from "./constants.js";
 import {
+  createAssistantJournal,
+  getRecentlyCreated,
+} from "./journal/assistant-content-service.js";
+import {
   ensureClaudeJournal,
   getClaudeJournal,
   isPageContextPinned,
@@ -46,6 +50,8 @@ Hooks.once("ready", async () => {
     togglePageContextPin,
     toggleJournalContextPin,
     isPageContextPinned,
+    createAssistantJournal,
+    getRecentlyCreated,
   };
 
   try {

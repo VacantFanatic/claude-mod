@@ -104,16 +104,61 @@
 
     <section class="claude-mod-sidebar-section claude-mod-recently-created">
       <header class="claude-mod-sidebar-header">
-        <span>{{localize "CLAUDE-MOD.CampaignAssistant.RecentlyCreated"}} (0)</span>
+        <span>{{localize "CLAUDE-MOD.CampaignAssistant.RecentlyCreated"}} ({{recentlyCreated.length}})</span>
       </header>
-      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+
+      {{#if recentlyCreated.length}}
+      <ul class="claude-mod-recent-list">
+        {{#each recentlyCreated}}
+        <li>
+          <button
+            type="button"
+            class="claude-mod-recent-item"
+            data-action="openRecent"
+            data-document-type="{{documentType}}"
+            data-document-id="{{documentId}}"
+            {{#if parentId}}data-parent-id="{{parentId}}"{{/if}}
+          >
+            <i class="fa-solid {{icon}}"></i>
+            <span class="claude-mod-recent-title">{{title}}</span>
+            <span class="claude-mod-recent-date">{{dateLabel}}</span>
+          </button>
+        </li>
+        {{/each}}
+      </ul>
+      <footer class="claude-mod-sidebar-footer">
+        <button type="button" class="claude-mod-sidebar-link" data-action="openKnowledgeBase">
+          <i class="fa-solid fa-book"></i> {{localize "CLAUDE-MOD.CampaignAssistant.KnowledgeBase"}}
+        </button>
+        <button type="button" class="claude-mod-sidebar-link" data-action="openPlayMaterials">
+          <i class="fa-solid fa-shield"></i> {{localize "CLAUDE-MOD.CampaignAssistant.PlayMaterials"}}
+        </button>
+      </footer>
+      {{else}}
+      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.RecentEmpty"}}</p>
+      <footer class="claude-mod-sidebar-footer">
+        <button type="button" class="claude-mod-sidebar-link" data-action="openKnowledgeBase">
+          <i class="fa-solid fa-book"></i> {{localize "CLAUDE-MOD.CampaignAssistant.KnowledgeBase"}}
+        </button>
+        <button type="button" class="claude-mod-sidebar-link" data-action="openPlayMaterials">
+          <i class="fa-solid fa-shield"></i> {{localize "CLAUDE-MOD.CampaignAssistant.PlayMaterials"}}
+        </button>
+      </footer>
+      {{/if}}
     </section>
 
     <section class="claude-mod-sidebar-section claude-mod-quick-create">
       <header class="claude-mod-sidebar-header">
         <span>{{localize "CLAUDE-MOD.CampaignAssistant.QuickCreate"}}</span>
       </header>
-      <p class="claude-mod-sidebar-placeholder">{{localize "CLAUDE-MOD.CampaignAssistant.ComingSoon"}}</p>
+      <div class="claude-mod-quick-create-grid">
+        {{#each quickCreateTypes}}
+        <button type="button" class="claude-mod-quick-create-button" data-action="quickCreate" data-create-type="{{id}}">
+          <i class="fa-solid {{icon}}"></i>
+          <span>{{label}}</span>
+        </button>
+        {{/each}}
+      </div>
     </section>
   </aside>
 </section>
